@@ -1,0 +1,69 @@
+# Oh My Pi - https://github.com/can1357/oh-my-pi
+#
+# NOT the Pi that sokar-pi adapts. That one is earendil-works/pi, published as
+# @earendil-works/pi-coding-agent and run as 'pi'. This one is a fork of a different Pi, published
+# as @oh-my-pi/pi-coding-agent and run as 'omp'. Three projects, two names.
+
+name: omp
+label: Oh My Pi
+binary: omp
+
+git_identity:
+  name: Oh My Pi
+  email: noreply@omp.sh
+
+headless:
+  # 'omp --print --mode json "<prompt>"'. The prompt is positional, so no flag names it - an empty
+  # prompt flag is how a definition says that. There is no turn limit and no verbose flag.
+  prompt_flag: ""
+  model_flag: "--model"
+  output_format_flags: ["--print", "--mode", "json"]
+
+session:
+  supports_resume: true
+  resume_flag: "--session"
+
+provider:
+  # OpenRouter's half - upstream, bearer header, the /api/v1 the OpenAI dialect is served under -
+  # is declared once in providers/openrouter.yaml.
+  default: openrouter
+
+  # 'native' because omp is not tied to one wire format: it knows providers and speaks whichever
+  # each one's own dialect is. Measured against 18.1.13: under the openrouter provider it posts to
+  # <baseUrl>/responses for anthropic, openai and z-ai model ids alike.
+  dialect: native
+
+  # A URL, not a socket: omp is pointed at a provider by a base URL in models.yml and has nowhere
+  # to put a socket path. Sokar answers that by binding a relay inside this task's namespace.
+  endpoint: url
+
+# Names 18.1.13 resolves and does not need: its own model catalogue, live model lists for
+# providers this task has no credential for, and the registry it was published to. Measured with
+# a resolver answering NXDOMAIN to every one of them - the run still reached its endpoint and
+# completed. Listed rather than left out so a reviewer can tell a refusal from an oversight, and
+# so the domain-coverage check can tell them apart too.
+#
+# There is deliberately no allowed_domains. The provider declares its own host, and nothing else
+# has to resolve for omp to start - unlike Claude Code, which quits without three of them.
+refused_domains:
+  - catalog.stencil.so
+  - api.kilo.ai
+  - api.venice.ai
+  - zenmux.ai
+  - coding-intl.dashscope.aliyuncs.com
+  - registry.npmjs.org
+
+install:
+  # One self-contained binary, so it is fetched and verified rather than carried in the package
+  # the way a tree of files has to be. Upstream publishes SHA256SUMS.txt beside every release,
+  # so the digest is the publisher's rather than one computed here:
+  #   https://github.com/can1357/oh-my-pi/releases/download/v<version>/SHA256SUMS.txt
+  #
+  # 200 MB, because it embeds the Bun runtime the CLI needs - 'omp' is a Bun single-file
+  # executable, not a Node script.
+  version: "${agent.cli.version}"
+  artifacts:
+    - url: https://github.com/can1357/oh-my-pi/releases/download/v${agent.cli.version}/omp-linux-x64
+      sha256: "3be5a308cc91e6f6bba148175fbe651d3583ff6d32ae221cb931dc08a64e1f39"
+      target: /home/agent/.local/bin/omp
+      mode: "0755"

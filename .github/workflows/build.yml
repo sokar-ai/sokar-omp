@@ -1,0 +1,178 @@
+# Builds against the PUBLISHED agent contract. Nothing here checks out the sokar repository,
+# and that is the property worth protecting: if this build ever needs one, the split has been
+# undone without anyone deciding to undo it.
+#
+# The end-to-end checks are not here. They need podman, nftables and an installed sokar; what
+# this repository can prove on its own is that the adapter compiles against the contract, that
+# its unit tests pass, and that it packages.
+name: Build
+
+# A push that only touches documentation builds nothing. Nothing in the build reads a
+# markdown file. A push that mixes docs and code still builds: the filter is per push, not
+# per file. workflow_dispatch ignores it, so a run can always be forced.
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['**/*.md']
+  pull_request:
+    branches: ['**']
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build:
+    name: Build and unit tests
+    # Pinned, not 'ubuntu-latest'. The binary is a native image and links glibc dynamically, so
+    # it runs only on that release or newer - and 'ubuntu-latest' moves. Built on the OLDEST
+    # glibc it must run against, which keeps it working on every machine Sokar itself runs on.
+    #
+    # 24.04 is no longer a machine Sokar *runs* on - it needs podman 5 and 24.04 ships 4.9.3 for
+    # its whole life - but it is still the right place to compile: an agent binary built here
+    # starts anywhere a newer Sokar does, and one built on 26.04 would not. The acceptance leg
+    # is what runs on a supported release.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm-community'
+          cache: 'maven'
+
+      # -s settings.xml declares the snapshot repository the agent contract is resolved from,
+      # and keeps a developer's own ~/.m2/settings.xml out of what makes a build work.
+      - name: Build and unit tests
+        run: ./mvnw -B -s settings.xml verify
+
+      # The packages are what an operator installs, so a build that has not produced them has
+      # not proved much. Native-image needs the GraalVM set up above. No container runtime is
+      # needed: this package carries no tool, only the adapter.
+      - name: Native binary and packages
+        run: ./mvnw -B -s settings.xml -Pnative,dist verify -DskipTests
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: |
+            target/*.deb
+            target/*.rpm
+          if-no-files-found: error
+
+      # Publishing only from main. A pull request builds and packages, which is what says the
+      # change is sound; it must not put an artifact where an operator could install it.
+      #
+      # In this job rather than a separate one: the native build here takes about twenty
+      # seconds, so a second job would cost more in setup than it saves.
+      # The action publishes build-info by itself at the end of the workflow. That goes into
+      # 'artifactory-build-info', which this token cannot write, so it warns on every run about
+      # something nobody asked for.
+      - uses: jfrog/setup-jfrog-cli@v5
+        with:
+          disable-auto-build-publish: true
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+
+      # The same two repositories Sokar itself publishes to. They belong together: this
+      # package declares 'Depends: sokar', so split across repositories an operator would need
+      # both configured for the dependency to resolve.
+      #
+      # The three deb.* properties are what get the package indexed. Without them Artifactory
+      # stores the file and apt never sees it, with no error anywhere.
+      - name: Publish the packages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+        run: |
+          set -eux
+          # --flat: without it the source directory travels too, and the package lands at
+          # pool/main/s/sokar-agent-omp/target/... instead of beside its siblings.
+          jf rt upload "target/*.deb" "sokar-dist-deb/pool/main/s/sokar-agent-omp/" \
+              --flat=true \
+              --target-props="deb.distribution=snapshots;deb.component=main;deb.architecture=amd64"
+          jf rt upload "target/*.rpm" "sokar-dist-rpm/snapshots/" --flat=true
+
+          # The bill beside the package, readable without installing. It also travels inside
+          # both packages at /usr/share/sokar/sbom.
+          jf rt upload "target/sokar-agent-omp.cdx.json" "sokar-dist-deb/pool/main/s/sokar-agent-omp/" --flat=true
+          jf rt upload "target/sokar-agent-omp.cdx.json" "sokar-dist-rpm/snapshots/" --flat=true
+
+      # Uploaded is not installable. Indexing is asynchronous, and a package with missing or
+      # wrong properties is stored happily and never listed - invisible until an operator's
+      # apt reports nothing to install.
+      - name: The package is indexed, not merely stored
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+        run: |
+          set -eu
+          tries=0
+          while [ "$tries" -lt 20 ]; do
+              if jf rt curl -s -XGET \
+                  "/sokar-dist-deb/dists/snapshots/main/binary-amd64/Packages" 2>/dev/null \
+                  | grep -q "Package: sokar-agent-omp"; then
+                  echo "  OK    the Debian index lists sokar-agent-omp"
+                  exit 0
+              fi
+              tries=$((tries + 1))
+              sleep 6
+          done
+          echo "::error::sokar-agent-omp never appeared in the index - uploaded but not indexed"
+          exit 1
+
+  acceptance:
+    name: Acceptance - ${{ matrix.os }}
+    runs-on: ubuntu-24.04
+    needs: build
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    strategy:
+      fail-fast: false
+      # One at a time. Three repositories rent machines from one Hetzner project and nothing
+      # coordinates them; running both legs at once doubles this repository's share of a limit
+      # it does not own. Each leg is minutes, so the cost is small and the collisions are not.
+      max-parallel: 1
+      matrix:
+        os: [ubuntu, fedora]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the Hetzner client
+        run: pip install --quiet hcloud
+
+      # SOKAR_E2E_OPENROUTER_API_KEY turns the tier 2 half on. Without it the run still checks
+      # that the packages install and that sokar finds the agent, and exits 0 - so a fork or a
+      # revoked key degrades to less coverage rather than to a red build with no information.
+      - name: Acceptance on ${{ matrix.os }}
+        env:
+          REMOTE_BUILD: ${{ secrets.REMOTE_BUILD }}
+          SSH: ${{ secrets.SSH }}
+          SOKAR_CI_LEG: acc-${{ matrix.os }}
+          SOKAR_E2E_OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          # This agent's model, set here rather than in a repository setting so it is visible,
+          # reviewable and changes with a commit. What is measured is that the credential was
+          # accepted, so it only has to be cheap and able to follow one instruction.
+          #
+          # Chosen by measurement: a ':free' variant returns rate_limit_exceeded. Oh My Pi
+          # always posts to <baseUrl>/responses - the OpenAI Responses dialect - and is pointed
+          # at the broker by ~/.omp/agent/models.yml rather than by an environment variable.
+          SOKAR_E2E_MODEL: z-ai/glm-4.6
+        run: python3 buildtools/ci/remote-acceptance.py --os ${{ matrix.os }}
+
+      - name: Delete what this run created
+        if: always()
+        env:
+          REMOTE_BUILD: ${{ secrets.REMOTE_BUILD }}
+          SOKAR_CI_LEG: acc-${{ matrix.os }}
+        run: python3 buildtools/ci/sweep.py --mine
