@@ -71,7 +71,7 @@ class OmpAgentTest {
         // The prompt is positional, so it has to come after the flags rather than behind one.
         assertThat(agent.headlessCommand(
                 new RunRequest("fix the bug", "z-ai/glm-4.6", null, null, false, true)))
-                .containsExactly("omp", "--model", "z-ai/glm-4.6", "--print", "--mode", "json",
+                .containsExactly("omp", "--auto-approve", "--model", "z-ai/glm-4.6", "--print", "--mode", "json",
                         "fix the bug");
     }
 
@@ -80,7 +80,7 @@ class OmpAgentTest {
 
         assertThat(agent.headlessCommand(
                 new RunRequest("carry on", null, null, "01a07a41", false, false)))
-                .containsExactly("omp", "--session", "01a07a41", "carry on");
+                .containsExactly("omp", "--auto-approve", "--session", "01a07a41", "carry on");
     }
 
     @Test

@@ -8,6 +8,17 @@ name: omp
 label: Oh My Pi
 binary: omp
 
+# What turns this agent's own approval prompts off. Sokar adds these to every run inside a task,
+# attached or not - never conditionally: the container is what makes the answer always yes, and
+# unattended there is nobody to answer. Only the 'how' is declared here, because the flag is this
+# CLI's own and Sokar must not guess it.
+#
+# --auto-approve rather than --approval-mode=yolo: both exist in 'omp --help', and the first says
+# only what is meant here - skip the approval prompts - while the second overrides a configured
+# mode with a third value whose other effects are undocumented.
+sandboxed:
+  arguments: ["--auto-approve"]
+
 git_identity:
   name: Oh My Pi
   email: noreply@omp.sh
