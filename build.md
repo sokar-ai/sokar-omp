@@ -109,3 +109,26 @@ Uploading is not the same as being installable: indexing is asynchronous, and a
 package with missing or wrong properties is stored happily and never listed. The
 workflow polls the Debian index for its own package name afterwards and fails the
 run if it never appears.
+
+## Acceptance, as a person at a terminal
+
+`src/acceptance` holds Cucumber scenarios that drive a real machine over ssh - a pty for what a
+person sees, no pty for what a script gets - through Sokar's published acceptance kit. They are
+off unless a host is named, so an ordinary build neither resolves the kit nor compiles them:
+
+```
+./mvnw -s settings.xml verify \
+    -Dsokar.acceptance.host=<machine with sokar and this agent's package installed> \
+    -Dsokar.acceptance.user=acceptance \
+    -Dsokar.acceptance.key=$HOME/.ssh/id_ed25519
+```
+
+The report lands in `target/acceptance.html`. The scenarios tagged `@credential` need
+`SOKAR_E2E_OPENROUTER_API_KEY` and `SOKAR_E2E_MODEL` in the environment of the machine running the
+suite - typed into the vault at a terminal, never on a command line - and are **skipped**, not
+passed, without them. There is no glue class here: every step is the kit's, which is what keeps
+this repository free of test code that knows about ssh.
+
+In CI the same suite runs from the runner against the rented machine when the repository variable
+`SOKAR_ACCEPTANCE_KIT` is set, beside `buildtools/acceptance.sh` until it has been green there
+for real; see the comment in `.github/workflows/build.yml`.
