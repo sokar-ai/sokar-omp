@@ -58,6 +58,7 @@
         <fuin-bom.version>1.0.2</fuin-bom.version>
         <build-helper.version>3.6.1</build-helper.version>
         <cyclonedx-maven-plugin.version>2.9.3</cyclonedx-maven-plugin.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
         <jdeb.version>1.14</jdeb.version>
         <rpm.version>1.13.0</rpm.version>
         <native-maven-plugin.version>1.1.11</native-maven-plugin.version>
@@ -232,6 +233,36 @@
             <id>dist</id>
             <build>
                 <plugins>
+
+                    <!-- The pinned CLI is not in this package; the image build fetches it.
+                         Added after the bill is generated, from the filtered definition, so the
+                         version and digest recorded are the ones an image will actually use. -->
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>record-the-fetched-cli</id>
+                                <!-- 'package', not 'prepare-package': the bill does not exist
+                                     until cyclonedx has run, and that runs at package. -->
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${project.basedir}/buildtools/add-fetched-cli.py</executable>
+                                    <arguments>
+                                        <argument>${project.build.directory}/${project.artifactId}.cdx.json</argument>
+                                        <argument>${project.build.outputDirectory}/agent/omp.yaml</argument>
+                                        <!-- The name compare-bills.py is told to expect moving. -->
+                                        <argument>omp</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
 
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>

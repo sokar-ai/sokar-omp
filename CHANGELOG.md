@@ -26,6 +26,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 ### Fixed
 
 - The models file is written only when there is a token to put in it, not merely an endpoint.
+- The bill records the CLI the image fetches, with its publisher's digest, so the update gate can see it change.
 - The changelog waiver answers for the commit it is written on, rather than for everything pushed with it.
 - The changelog check asks whether an entry was added, not whether `CHANGELOG.md` was touched; a rewritten link line used to satisfy it.
 - The changelog check reads the waiver after fetching the base commit, not before; in a shallow clone it missed `[no changelog]` and failed the build anyway.
