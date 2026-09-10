@@ -25,6 +25,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Fixed
 
+- The changelog check no longer exempts documentation; a typo says `[no changelog]` like any other change that ships nothing observable.
 - The acceptance suite refuses a run as root, rather than passing every check but the one that needs the broker.
 
 [Unreleased]: https://github.com/fuinorg/sokar-omp/commits/main
