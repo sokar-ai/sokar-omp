@@ -32,8 +32,19 @@ jobs:
           cache: 'maven'
 
       # -s settings.xml declares the snapshot repository, and keeps a developer's own out.
+      # A changelog nobody is obliged to write stops being written.
+      - name: The changelog says what changed
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: python3 buildtools/check-changelog.py "$BASE" "$HEAD"
+
       - name: Build and unit tests
         run: ./mvnw -B -s settings.xml verify
+
+      # A bump that forgets the digest builds and packages green, and fails at an image build.
+      - name: The pin agrees everywhere it is written
+        run: python3 buildtools/check-pin.py
 
       # The packages are what an operator installs;
       - name: Native binary and packages

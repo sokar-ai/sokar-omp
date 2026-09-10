@@ -90,6 +90,38 @@ Three things, in the order they are worth running.
 What none of them checks is that a **valid** key gets a 200. That needs an
 OpenRouter account.
 
+## The changelog
+
+`CHANGELOG.md`, in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+**One sentence per change** - it is a compressed summary of the commits it covers, and
+`git log` is where anyone who wants the reasoning goes.
+
+A version bump is not written by hand: `buildtools/update.py` writes its own line and replaces
+the one it wrote last time. Everything else is by hand, and `buildtools/check-changelog.py`
+fails a build that forgot; a change that ships nothing observable says `[no changelog]` in a
+commit message.
+
+## Following Oh My Pi without watching it
+
+`.github/workflows/update.yml` runs once a week, on Monday. It asks GitHub for the newest
+release and, if that is not what this module pins, does what a person would: `update.py`,
+rebuild, and prove the result on a real Ubuntu machine and a real Fedora one **before anything
+is published**.
+
+**There is no stable channel here.** Claude Code publishes `stable` beside `latest`, so that
+pipeline can follow somebody else's judgement about what is ready. Upstream's newest release is
+all this one has, which puts the whole weight on the verification below.
+
+**The point is the stopping.** The run refuses to publish when an acceptance suite failed, when
+the third-party component set or a license changed, or when the upstream **major** version
+moved. Whatever the outcome it opens a pull request; merging is what publishes. Auto-merge is
+off behind `SOKAR_UPDATE_AUTO_MERGE`, and needs `SOKAR_UPDATE_TOKEN` as well - a push made with
+the workflow's own token triggers no build, so merging with it would publish nothing and report
+success.
+
+`buildtools/check-pin.py` runs on every push: the pinned version, the download URL and the
+digest must agree with each other and with the `SHA256SUMS.txt` upstream publishes.
+
 ## Publishing
 
 A push to `main` uploads the two packages to Artifactory, into the **same repositories

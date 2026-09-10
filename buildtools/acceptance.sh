@@ -146,6 +146,20 @@ print(len(names))
 else
     fail "the installed package carries no usable bill at $BOM"
 fi
+
+# Asked of the MACHINE, not of the build that made the package.
+# This agent's row, not the first 'installs:': a machine with two agents reported the other one.
+DECLARED="$(sokar agents --supply-chain 2>/dev/null \
+    | awk '$1 == "omp" { found = 1; next } found && $1 == "installs:" { print $2; exit }')"
+
+if [ -z "$DECLARED" ]; then
+    fail "the installed adapter does not say which Oh My Pi version it installs"
+elif [ -n "${SOKAR_E2E_EXPECT_CLI:-}" ] && [ "$DECLARED" != "$SOKAR_E2E_EXPECT_CLI" ]; then
+    # Set by the update pipeline: proof that the candidate, not an older package, got installed.
+    fail "expected Oh My Pi $SOKAR_E2E_EXPECT_CLI, this machine installs $DECLARED"
+else
+    pass "this machine installs Oh My Pi $DECLARED"
+fi
 rm -f /tmp/bom-names
 
 echo
