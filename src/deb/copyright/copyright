@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: sokar-agent-omp
-Source: https://github.com/fuinorg/sokar-omp
+Source: https://github.com/sokar-ai/sokar-omp
 
 Files: *
 Copyright: 2026 Michael Schnell <michael@fuin.org>

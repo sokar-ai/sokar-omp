@@ -1,12 +1,12 @@
 # sokar-omp
 
-The [Sokar](https://github.com/fuinorg/sokar) adapter for
+The [Sokar](https://github.com/sokar-ai/sokar) adapter for
 [Oh My Pi](https://github.com/can1357/oh-my-pi) — published on npm as
 `@oh-my-pi/pi-coding-agent`, shipped as a standalone binary called `omp`, and
 homed at [omp.sh](https://omp.sh).
 
 **Not [Pi](https://github.com/earendil-works/pi)**, which
-[sokar-pi](https://github.com/fuinorg/sokar-pi) adapts. That is a different
+[sokar-pi](https://github.com/sokar-ai/sokar-pi) adapts. That is a different
 project by a different author, published as `@earendil-works/pi-coding-agent`
 and run as `pi`. Oh My Pi is a fork of a *third* project also called Pi. Three
 codebases, two names: the link is the identity, and the two packages are checked
@@ -15,12 +15,12 @@ against each other rather than assumed apart — see
 
 ## Install
 
-Needs [Sokar](https://github.com/fuinorg/sokar) itself - this package declares `Depends: sokar`, and both
+Needs [Sokar](https://github.com/sokar-ai/sokar) itself - this package declares `Depends: sokar`, and both
 come from the same repository.
 
 Set the package repository up once, as the flavour's guide describes —
-[Debian and Ubuntu](https://github.com/fuinorg/sokar/blob/main/doc/getting-started-debian.md)
-or [Fedora and RHEL](https://github.com/fuinorg/sokar/blob/main/doc/getting-started-fedora.md)
+[Debian and Ubuntu](https://github.com/sokar-ai/sokar/blob/main/doc/getting-started-debian.md)
+or [Fedora and RHEL](https://github.com/sokar-ai/sokar/blob/main/doc/getting-started-fedora.md)
 — then:
 
 ```

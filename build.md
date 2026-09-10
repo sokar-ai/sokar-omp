@@ -1,6 +1,6 @@
 # Building
 
-Nothing here needs a checkout of [Sokar](https://github.com/fuinorg/sokar). This
+Nothing here needs a checkout of [Sokar](https://github.com/sokar-ai/sokar). This
 repository compiles against the **published agent contract** - `sokar-agent-api`
 and `sokar-wire` - resolved from Maven, and that is the property worth keeping: if
 a build here ever needs the Sokar sources, the split has been undone without
@@ -25,7 +25,7 @@ sokar-agent-omp-1.0.0~SNAPSHOT-1.x86_64.rpm  6.2 MB
 Measured on one machine: 2 s for the unit build, 25 s with the native image and
 both packages. **No container runtime is needed to build this** — the tool is not
 carried in the package, so there is no tree to assemble. That is the whole
-difference from [sokar-pi](https://github.com/fuinorg/sokar-pi), which takes
+difference from [sokar-pi](https://github.com/sokar-ai/sokar-pi), which takes
 minutes and needs podman: Pi is 162 npm packages with no single URL to pin, while
 Oh My Pi publishes one self-contained 200 MB binary per release with a
 `SHA256SUMS.txt` beside it. Where a publisher offers a digest, the image build
