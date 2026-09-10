@@ -67,4 +67,13 @@ class OmpContainerSetupTest {
                 .as("written as a JSON literal, which YAML reads as a double-quoted scalar")
                 .contains("\"tok\\\"en\\\\with\\nquotes\"");
     }
+
+    @Test
+    void writesNothingWhenThereIsNoTokenToPresent() {
+
+        // The endpoint alone is half a wiring: the models file would carry an empty token, which
+        // omp rejects looking exactly like a wrong one.
+        assertThat(new OmpContainerSetup().files(new SetupContext(
+                "  ", "api-key", "/workspace", "http://127.0.0.1:9419", "openrouter"))).isEmpty();
+    }
 }
