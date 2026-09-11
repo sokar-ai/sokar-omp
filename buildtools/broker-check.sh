@@ -62,8 +62,8 @@ START="$WORK/start.log"
 # No --raw: it turns the machine-readable flags off, and omp then starts its terminal interface
 # and is killed by the hangup it gets instead of answering.
 # --clearance deny: a check must not raise a prompt on somebody's desktop and then wait for it.
-(cd "$WORK" && timeout 1200 sokar task run --agent omp --model z-ai/glm-4.6 \
-    -P "reply with the single word SOKARLIVE" --clearance deny --keep > "$START" 2>&1)
+(cd "$WORK" && timeout 1200 sokar task start --agent omp --model z-ai/glm-4.6 \
+    -P "reply with the single word SOKARLIVE" --clearance deny > "$START" 2>&1)
 CONTAINER="$(grep '^container ' "$START" | awk '{print $2}')"
 STATE="$(grep '^sidecar ' "$START" | awk '{print $2}' | xargs dirname 2>/dev/null)"
 info "container ${CONTAINER:-none}, state ${STATE:-none}"

@@ -233,8 +233,8 @@ EOF
 # --clearance deny: an acceptance run must never raise a prompt on somebody's desktop and
 # then wait for it.
 START_LOG="$WORK/start.log"
-(cd "$WORK" && timeout 900 sokar task run --agent omp \
-    --keep --no-attach --clearance deny > "$START_LOG" 2>&1)
+(cd "$WORK" && timeout 900 sokar task start --agent omp \
+    --detach --clearance deny > "$START_LOG" 2>&1)
 
 CONTAINER="$(grep '^container ' "$START_LOG" | awk '{print $2}')"
 if [ -z "$CONTAINER" ]; then
