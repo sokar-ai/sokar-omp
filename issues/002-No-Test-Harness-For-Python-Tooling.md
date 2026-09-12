@@ -20,6 +20,24 @@ built, not a fix.
 Until then, guards in these scripts are verified by hand, which is not repeatable and leaves no
 record.
 
+## The minimum regression matrix, until there is a harness
+
+These were run by hand against `digest_in(body, version)` on 2026-09-12 and are the cases a change
+to that parser has to reproduce. Written down here rather than left in the review answer, because
+a matrix nobody can find is a matrix that gets repeated from memory and shrinks each time.
+
+| input | expected |
+|---|---|
+| one valid digest for the asset | accepted |
+| the asset absent from the body | refused, exit 1 |
+| two different digests for the asset | refused, exit 1 |
+| `abc123` | refused - not a digest |
+| 64 uppercase hex characters | refused - not lowercase |
+| the same digest twice | accepted |
+
+Whoever changes the parser either automates these or runs them and records the result in the
+commit. "It still works" is not one of the two.
+
 ## What would close it
 
 - Decide on a runner (pytest is the obvious one) and where its dependency is pinned.
