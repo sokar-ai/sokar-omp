@@ -10,6 +10,12 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ## [Unreleased]
 
+### Security
+
+- The acceptance run passes the model name to the container as data rather than inside a shell command.
+- The update script refuses a malformed or duplicated upstream digest before writing it anywhere.
+- The CI no longer installs the unpinned Hetzner Python client; nothing had used it since the Java machine tooling replaced it.
+
 ### Added
 
 - The Oh My Pi adapter: definition, credential handling, headless commands. Its log is shown as omp writes it; there is no formatter for it yet.

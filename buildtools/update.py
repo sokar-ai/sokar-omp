@@ -46,12 +46,45 @@ ASSET = "omp-linux-x64"
 
 VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 
+# What upstream must publish for the asset: 64 lowercase hex characters and nothing else.
+DIGEST = re.compile(r"[0-9a-f]{64}")
+
 ROOT = Path(__file__).resolve().parents[1]
 POM = ROOT / "pom.xml"
 DEFINITION = ROOT / "src" / "main" / "resources" / "agent" / "omp.yaml"
 CHANGELOG = ROOT / "CHANGELOG.md"
 
 ENTRY = re.compile(r"^- Oh My Pi pinned to (\S+?)\.?(?: \(was (\S+?)\.?\))?\.$", re.M)
+
+
+def digest_in(body: str, version: str) -> str:
+    """
+    Picks our asset's digest out of a published SHA256SUMS.txt, refusing anything malformed.
+
+    Kept apart from the download so the rules below can be exercised without the network.
+
+    :param body: Content of the published file.
+    :param version: The release it belongs to, for the message.
+    :return: The 64-character digest.
+    """
+    # Every line for our asset, not the first: a file naming it twice is malformed, and taking
+    # whichever came first would pin whatever an attacker appended.
+    found = [parts[0] for parts in (line.split() for line in body.splitlines())
+             if len(parts) == 2 and parts[1] == ASSET]
+    if not found:
+        print(f"{version} publishes no {ASSET} in its SHA256SUMS.txt", file=sys.stderr)
+        sys.exit(1)
+    if len(set(found)) > 1:
+        print(f"{version} publishes {len(found)} different digests for {ASSET}", file=sys.stderr)
+        sys.exit(1)
+    digest = found[0]
+    # Checked here rather than by the pin check after the build has been prepared: a value that is
+    # not a digest must never reach a file.
+    if not DIGEST.fullmatch(digest):
+        print(f"{version} publishes '{digest}' for {ASSET}, which is not a SHA-256 digest",
+              file=sys.stderr)
+        sys.exit(1)
+    return digest
 
 
 def published_digest(version: str) -> str:
@@ -73,12 +106,7 @@ def published_digest(version: str) -> str:
     except Exception as failure:  # noqa: BLE001
         unreadable(f"{url}: {failure}")
 
-    for line in body.splitlines():
-        parts = line.split()
-        if len(parts) == 2 and parts[1] == ASSET:
-            return parts[0]
-    print(f"{version} publishes no {ASSET} in its SHA256SUMS.txt", file=sys.stderr)
-    sys.exit(1)
+    return digest_in(body, version)
 
 
 def unreadable(reason: str):
