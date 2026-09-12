@@ -6,15 +6,17 @@ somebody would otherwise ask "why is it like this?" and find only code.
 Accepted risks live here too. An accepted risk is not a forgotten one: it says what the exposure
 is, why it is not being removed, and what would change the answer.
 
-Newest first, and in the order they stand below. Each row links to its full text.
+Newest first, and in the order they stand below. The date is when the decision was taken,
+not when its row was written - the older ones were found with `git log -S` on the sentence
+rather than guessed.
 
 | Date | What was decided |
 |---|---|
 | 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
-| 2026-09-12 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
-| 2026-09-12 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
-| 2026-09-12 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
 | 2026-09-12 | [What the acceptance actually proved, and with what](#what-the-acceptance-actually-proved-and-with-what) - Fedora 44, the installed package, a real credential |
+| 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
+| 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
+| 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
 
 ## Accepted risk: the release binary and its digest share one trust root
 
@@ -43,6 +45,24 @@ before installation in the image layer; the update job opens a pull request rath
 by itself; and since 2026-09-12 the update script refuses a malformed or duplicated digest before
 writing it anywhere.
 
+## What the acceptance actually proved, and with what
+
+**Recorded 2026-09-12** from Sokar requirement A05 before it was retired. It is the only record of
+what was measured rather than assumed, and the requirement was about to take it with it.
+
+Run whole on **Fedora 44** against the installed `.rpm` with a **real OpenRouter key**:
+
+- both packages install from the package repository rather than from a build tree;
+- `sokar` discovers an agent it was never linked against;
+- **the agent authenticated against the provider and completed a prompt**;
+- the container held no credential but the task-scoped token;
+- and the key appeared in no log the run produced.
+
+Also measured: the digest matching upstream's published sum; `omp --version` on a stock
+`ubuntu:24.04` with nothing added; the broker path end to end with a deliberately fake key, ending
+in the provider's own 401 rather than the proxy's; and coexistence with Pi, whose tree is nearly
+identical under a different name and is exactly where a collision would have hidden.
+
 ## A fork is not a promise: how this agent is pointed at the broker
 
 **Recorded 2026-09-12** when Sokar requirement A05 was retired into this repository. It is the
@@ -68,21 +88,3 @@ ageing rule the other agents adopt needs its own answer here - see `issues/003`.
 The package is about 6 MB because it fetches upstream's self-contained 200 MB binary at image-build
 time and checks it against the digest upstream publishes, rather than carrying it. The trade is
 recorded in the accepted risk above: one trust root for both the binary and its digest.
-
-## What the acceptance actually proved, and with what
-
-**Recorded 2026-09-12** from Sokar requirement A05 before it was retired. It is the only record of
-what was measured rather than assumed, and the requirement was about to take it with it.
-
-Run whole on **Fedora 44** against the installed `.rpm` with a **real OpenRouter key**:
-
-- both packages install from the package repository rather than from a build tree;
-- `sokar` discovers an agent it was never linked against;
-- **the agent authenticated against the provider and completed a prompt**;
-- the container held no credential but the task-scoped token;
-- and the key appeared in no log the run produced.
-
-Also measured: the digest matching upstream's published sum; `omp --version` on a stock
-`ubuntu:24.04` with nothing added; the broker path end to end with a deliberately fake key, ending
-in the provider's own 401 rather than the proxy's; and coexistence with Pi, whose tree is nearly
-identical under a different name and is exactly where a collision would have hidden.
