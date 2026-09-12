@@ -32,3 +32,29 @@ workflow, which it does often.
 before installation in the image layer; the update job opens a pull request rather than publishing
 by itself; and since 2026-09-12 the update script refuses a malformed or duplicated digest before
 writing it anywhere.
+
+## A fork is not a promise: how this agent is pointed at the broker
+
+**Recorded 2026-09-12** when Sokar requirement A05 was retired into this repository. It is the
+finding that requirement got wrong, which is why it is worth keeping.
+
+The requirement reasoned that Oh My Pi inherits Pi's shape, so Pi's extension mechanism would be the
+first thing to try. **`registerProvider` does survive the fork** - same name, compatible signature -
+**and it does not redirect a built-in provider** in 18.1.13. Measured: the extension loads, runs,
+writes its marker, and requests still go to `openrouter.ai`.
+
+What works is `providers.<name>.baseUrl` in `~/.omp/agent/models.yml`, so the container is pointed
+at the broker **by a file rather than by a variable or an extension**. The packaging this agent
+shares with Pi turned out to matter more than the mechanism it does not.
+
+## Its release cadence is unlike the other two
+
+617 npm versions against Pi's 0.85.0, and three releases on three consecutive days. Nothing in the
+update pipeline can be shared with Pi on the grounds of the two being the same project, and any
+ageing rule the other agents adopt needs its own answer here - see `issues/003`.
+
+## Why the package is small and the download is not
+
+The package is about 6 MB because it fetches upstream's self-contained 200 MB binary at image-build
+time and checks it against the digest upstream publishes, rather than carrying it. The trade is
+recorded in the accepted risk above: one trust root for both the binary and its digest.
