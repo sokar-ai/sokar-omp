@@ -6,6 +6,16 @@ somebody would otherwise ask "why is it like this?" and find only code.
 Accepted risks live here too. An accepted risk is not a forgotten one: it says what the exposure
 is, why it is not being removed, and what would change the answer.
 
+Newest first, and in the order they stand below. Each row links to its full text.
+
+| Date | What was decided |
+|---|---|
+| 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
+| 2026-09-12 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
+| 2026-09-12 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
+| 2026-09-12 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+| 2026-09-12 | [What the acceptance actually proved, and with what](#what-the-acceptance-actually-proved-and-with-what) - Fedora 44, the installed package, a real credential |
+
 ## Accepted risk: the release binary and its digest share one trust root
 
 **Decided:** 2026-09-12, from the security review in `.codex-review.md` (O-03).
