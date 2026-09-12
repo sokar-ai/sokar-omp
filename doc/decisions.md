@@ -58,3 +58,21 @@ ageing rule the other agents adopt needs its own answer here - see `issues/003`.
 The package is about 6 MB because it fetches upstream's self-contained 200 MB binary at image-build
 time and checks it against the digest upstream publishes, rather than carrying it. The trade is
 recorded in the accepted risk above: one trust root for both the binary and its digest.
+
+## What the acceptance actually proved, and with what
+
+**Recorded 2026-09-12** from Sokar requirement A05 before it was retired. It is the only record of
+what was measured rather than assumed, and the requirement was about to take it with it.
+
+Run whole on **Fedora 44** against the installed `.rpm` with a **real OpenRouter key**:
+
+- both packages install from the package repository rather than from a build tree;
+- `sokar` discovers an agent it was never linked against;
+- **the agent authenticated against the provider and completed a prompt**;
+- the container held no credential but the task-scoped token;
+- and the key appeared in no log the run produced.
+
+Also measured: the digest matching upstream's published sum; `omp --version` on a stock
+`ubuntu:24.04` with nothing added; the broker path end to end with a deliberately fake key, ending
+in the provider's own 401 rather than the proxy's; and coexistence with Pi, whose tree is nearly
+identical under a different name and is exactly where a collision would have hidden.
