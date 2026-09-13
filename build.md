@@ -97,9 +97,8 @@ OpenRouter account.
 `git log` is where anyone who wants the reasoning goes.
 
 A version bump is not written by hand: `buildtools/update.py` writes its own line and replaces
-the one it wrote last time. Everything else is by hand, and `buildtools/check-changelog.py`
-fails a build that forgot; a change that ships nothing observable says `[no changelog]` in a
-commit message.
+the one it wrote last time. Everything else is by hand, and since 2026-09-13 nothing checks for
+it; requiring an entry returns with Sokar B55 - see [`doc/decisions.md`](doc/decisions.md).
 
 ## Following Oh My Pi without watching it
 

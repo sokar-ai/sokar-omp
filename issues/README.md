@@ -6,7 +6,7 @@ identity, not sequence.
 | # | Status | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
 | [006](006-Check-What-Omp-Asks-At-First-Run.md) | open | — | Whether a fresh task shows anything before Oh My Pi starts work. Never checked. | 1 |
-| [010](010-Replace-The-Build-Time-Python-Tools.md) | blocked | Sokar B53 | The Python tools every build runs, replaced by the tool Sokar publishes. | 0 |
+| [010](010-Replace-The-Build-Time-Python-Tools.md) | blocked | Sokar B53 | The Python tool every package build runs, replaced by the tool Sokar publishes. | 0 |
 | [011](011-Replace-The-Update-Pipeline-Python-Tools.md) | blocked | Sokar B53 | The Python tools the update job runs, and the per-push digest check, replaced by the tool Sokar publishes. | 0 |
 | [012](012-Acceptance-As-Kit-Scenarios.md) | blocked | Sokar B53 | The acceptance and broker shell scripts turned into scenarios on acceptance-kit steps. | 1 |
 | [001](001-Pin-GitHub-Actions-By-Sha.md) | handed on | — | Every third-party GitHub Action runs from a mutable tag, beside the tokens that publish packages and open pull requests. | 1 |

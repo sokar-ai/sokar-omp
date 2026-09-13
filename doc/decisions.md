@@ -12,11 +12,27 @@ rather than guessed.
 
 | Date | What was decided |
 |---|---|
+| 2026-09-13 | [The changelog check is removed, not replaced](#the-changelog-check-is-removed-not-replaced) - requiring an entry returns with Sokar B55, on logchange |
 | 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
 | 2026-09-12 | [What the acceptance actually proved, and with what](#what-the-acceptance-actually-proved-and-with-what) - Fedora 44, the installed package, a real credential |
 | 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
 | 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
 | 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+
+## The changelog check is removed, not replaced
+
+**Decided 2026-09-13 by the operator**, across all Sokar repositories.
+
+`buildtools/check-changelog.py` failed a push whose code change did not touch `CHANGELOG.md`. It is
+deleted, and nothing replaces it for now. Sokar is moving to logchange - one YAML file per change,
+and a generated `CHANGELOG.md` - and a check for a hand-kept file would have to be rebuilt the moment
+that reaches this repository. Requiring an entry returns as Sokar B55, proposed to logchange upstream
+first, which keeps the three lessons the script carried: a waiver answers for its own commit only,
+documentation is not exempt, and a range that cannot be compared fails.
+
+**Until then** the changelog is still written by hand in the same commit; only the enforcement is gone.
+
+**What would change it:** B55 landing, or logchange being adopted here.
 
 ## Accepted risk: the release binary and its digest share one trust root
 
