@@ -119,8 +119,9 @@ off behind `SOKAR_UPDATE_AUTO_MERGE`, and needs `SOKAR_UPDATE_TOKEN` as well - a
 the workflow's own token triggers no build, so merging with it would publish nothing and report
 success.
 
-`buildtools/check-pin.py` runs on every push: the pinned version, the download URL and the
-digest must agree with each other and with the `SHA256SUMS.txt` upstream publishes.
+`PinAgreementTest` fails the unit tests when the filtered definition's version, the pom and
+the download URL disagree. The digest needs the network, so `buildtools/check-pin.py` still
+checks it on every push against the `SHA256SUMS.txt` upstream publishes.
 
 ## Publishing
 

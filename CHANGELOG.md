@@ -10,6 +10,10 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ## [Unreleased]
 
+### Changed
+
+- The pinned version, the pom and the download URL are checked by a unit test on the filtered definition the package ships.
+
 ### Security
 
 - The acceptance suite no longer puts the test credential on a command line; the pattern reaches `grep` on a file descriptor.
