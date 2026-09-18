@@ -12,12 +12,32 @@ rather than guessed.
 
 | Date | What was decided |
 |---|---|
+| 2026-09-18 | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installed anything |
 | 2026-09-13 | [The changelog check is removed, not replaced](#the-changelog-check-is-removed-not-replaced) - requiring an entry returns with Sokar B55, on logchange |
 | 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
 | 2026-09-12 | [What the acceptance actually proved, and with what](#what-the-acceptance-actually-proved-and-with-what) - Fedora 44, the installed package, a real credential |
 | 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
 | 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
 | 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+
+## omp does not check for a newer version in a task
+
+**Decided 2026-09-18 by the operator**, after Claude Code was found updating itself inside a task.
+
+**Read in the pinned 18.1.13, not run:** with `startup.checkUpdate` on, which is the default, omp
+asks the npm registry or GitHub for a newer release at start and shows a notice. It installs nothing
+by itself. Neither host is reachable from a task, so the check can only fail.
+
+**How it is stopped:** `startup.checkUpdate: false` in `~/.omp/agent/config.yml`, written into every
+container. Measured on 18.1.13: `omp config get startup.checkUpdate` answers `false` with the file
+and `true` without it.
+
+**What is not covered:** `omp update` has no switch, and it would replace
+`/home/agent/.local/bin/omp`, which the agent can write. What keeps it from doing that is that the
+task reaches neither host.
+
+**What would change it:** an omp release that installs updates by itself, or a switch for
+`omp update`.
 
 ## The changelog check is removed, not replaced
 
