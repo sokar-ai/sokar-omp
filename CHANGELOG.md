@@ -29,6 +29,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Added
 
+- The packages provide `sokar-agent`, so the setup script and the daemon list this agent as one a person can choose.
 - The Oh My Pi adapter: definition, credential handling, headless commands. Its log is shown as omp writes it; there is no formatter for it yet.
 - `.deb` and `.rpm` packages, published to Artifactory from `main`.
 - Oh My Pi 18.1.13, pinned by version and SHA-256 against the `SHA256SUMS.txt` upstream publishes.
