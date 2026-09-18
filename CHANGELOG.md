@@ -16,6 +16,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Changed
 
+- Every task the acceptance suite starts names its repository, which Sokar now requires.
 - The pinned version, the pom and the download URL are checked by a unit test on the filtered definition the package ships.
 
 ### Security
