@@ -5,7 +5,6 @@ identity, not sequence.
 
 | # | Status | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| [013](013-Declare-What-The-Binary-Links-Against.md) | in progress | — | The packages declare the glibc and zlib the native binary needs. | 0 |
 | [006](006-Check-What-Omp-Asks-At-First-Run.md) | open | — | Whether a fresh task shows anything before Oh My Pi starts work. Never checked. | 1 |
 | [010](010-Replace-The-Build-Time-Python-Tools.md) | blocked | Sokar B53 | The Python tool every package build runs, replaced by the tool Sokar publishes. | 0 |
 | [011](011-Replace-The-Update-Pipeline-Python-Tools.md) | blocked | Sokar B53 | The Python tools the update job runs, and the per-push digest check, replaced by the tool Sokar publishes. | 0 |
