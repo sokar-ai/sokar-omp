@@ -42,6 +42,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Fixed
 
+- The build's index check follows Artifactory's redirect to cloud storage; it had read every package as not indexed.
 - The models file is written only when there is a token to put in it, not merely an endpoint.
 - The bill records the CLI the image fetches, with its publisher's digest, so the update gate can see it change.
 - The update job stops instead of rolling back when upstream offers an older version than is pinned, and compares versions as numbers rather than text.
