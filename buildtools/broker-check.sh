@@ -25,15 +25,12 @@ pass() { printf '  PASS  %s\n' "$1"; }
 fail() { printf '  FAIL  %s\n' "$1"; FAILURES=$((FAILURES + 1)); }
 info() { printf '        %s\n' "$1"; }
 
+# Sokar removes what it built for the project, and with --force also after a run that never
+# got to follow it. Nothing here deletes Sokar's own directories by path.
 cleanup() {
-    [ -n "$CONTAINER" ] && podman rm -f "$CONTAINER" >/dev/null 2>&1
+    sokar project unfollow omp-check --force >/dev/null 2>&1
     sokar vault unlock --forget >/dev/null 2>&1
-    podman rmi -f sokar/omp-check >/dev/null 2>&1
-    # State directories outlive the container - nothing removes the files - and they hold this
-    # run's dead token.
-    rm -rf "$WORK" "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/sokar/sokar-omp-check-"*
-    rm -rf "${XDG_DATA_HOME:-$HOME/.local/share}/sokar/build/omp-check"
-    rm -rf "${XDG_DATA_HOME:-$HOME/.local/share}/sokar/mirrors/omp-check.git"
+    rm -rf "$WORK"
     :
 }
 trap cleanup EXIT
@@ -55,6 +52,11 @@ image:
 egress:
   sets: [git-hosting]
 EOF
+git -C "$WORK" init -q
+git -C "$WORK" add project.yml
+git -C "$WORK" -c user.name=omp-check -c user.email=omp-check@localhost commit -qm "project"
+sokar project follow omp-check "$WORK" --unverified >/dev/null 2>&1 \
+    || { echo "could not follow this run's own project"; exit 2; }
 
 echo "== the brokering path, with a fake credential =="
 
@@ -62,7 +64,7 @@ START="$WORK/start.log"
 # No --raw: it turns the machine-readable flags off, and omp then starts its terminal interface
 # and is killed by the hangup it gets instead of answering.
 # --clearance deny: a check must not raise a prompt on somebody's desktop and then wait for it.
-(cd "$WORK" && timeout 1200 sokar task start --repository omp-check --agent omp --model z-ai/glm-4.6 \
+(timeout 1200 sokar task start --project omp-check --repository omp-check --agent omp --model z-ai/glm-4.6 \
     -P "reply with the single word SOKARLIVE" --clearance deny > "$START" 2>&1)
 CONTAINER="$(grep '^container ' "$START" | awk '{print $2}')"
 STATE="$(grep '^sidecar ' "$START" | awk '{print $2}' | xargs dirname 2>/dev/null)"
