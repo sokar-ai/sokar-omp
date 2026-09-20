@@ -1,4 +1,4 @@
-# 006 — Check what Oh My Pi asks at first run inside a task
+# OM06 — Check what Oh My Pi asks at first run inside a task
 
 **Priority:** 1
 **Opened:** 2026-09-13

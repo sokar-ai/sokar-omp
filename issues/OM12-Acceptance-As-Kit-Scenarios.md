@@ -1,4 +1,4 @@
-# 012 — Turn the acceptance scripts into scenarios on acceptance-kit steps
+# OM12 — Turn the acceptance scripts into scenarios on acceptance-kit steps
 
 **Priority:** 2
 **Opened:** 2026-09-13
@@ -12,8 +12,8 @@ diverged slightly from its two siblings - and `broker-check.sh`, which only this
 Cucumber half of the same run already uses the kit. Both become scenarios on kit steps, so one check
 is written once for three agents.
 
-Issue 007 (a release that adds a first-run dialog) is the first scenario of this kind, and
-`broker-check.sh` is what issue 004's brokering question was measured with.
+OM07 (a release that adds a first-run dialog) is the first scenario of this kind, and
+`broker-check.sh` is what OM04's brokering question was measured with.
 
 ## What would close it
 

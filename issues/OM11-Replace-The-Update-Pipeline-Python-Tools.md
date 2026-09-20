@@ -1,4 +1,4 @@
-# 011 — Replace the update pipeline's Python tools with Sokar's shared tool
+# OM11 — Replace the update pipeline's Python tools with Sokar's shared tool
 
 **Priority:** 1
 **Opened:** 2026-09-13
@@ -20,9 +20,10 @@ hand-made version bump that forgot the digest. Its header is still a copy of the
 adapter's and names `claude.yaml` and Anthropic; its code correctly checks Oh My Pi. It goes with
 the script.
 
-Whatever issue 003 settles about the update rules applies to the replacement unchanged.
+Whatever OM03 settles about the update rules applies to the replacement unchanged.
 
-## The minimum regression matrix, carried over from issue 002
+## The minimum regression matrix, carried over from the retired issue about the Python
+tooling having no test harness
 
 Run by hand against `digest_in(body, version)` on 2026-09-12. The replacement's digest parser must
 reproduce every row:

@@ -1,4 +1,4 @@
-# 004 — Can any of this agent's subscription providers be brokered
+# OM04 — Can any of this agent's subscription providers be brokered
 
 **Priority:** 3
 **Opened:** 2026-09-12
