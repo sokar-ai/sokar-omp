@@ -48,6 +48,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Fixed
 
+- The unit suite no longer pins the upstream version in an assertion, which made every automated update fail with "expected 18.1.13 but was 18.2.7".
 - The packages declare the glibc (2.34) and zlib the native binary links against, and the build fails when the binary needs more.
 - The build's index check follows Artifactory's redirect to cloud storage; it had read every package as not indexed.
 - The models file is written only when there is a token to put in it, not merely an endpoint.

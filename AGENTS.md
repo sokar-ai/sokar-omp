@@ -206,5 +206,14 @@ agent API and wire artifacts, never on Sokar's implementation.
   acceptance script that runs against a rented machine.
 - **Upstream metadata is validated before it is written anywhere.** A digest that is not a digest,
   or a release naming our asset twice, stops the update rather than reaching a file.
+- **No test may name the pinned version.** The update job bumps `agent.cli.version`, filtering
+  carries it into the definition, and a literal in a test fails every bump - measured 2026-09-21,
+  where `expected 18.1.13 but was 18.2.7` stopped the run in `sokar-omp`. Which version is pinned is
+  `PinAgreementTest`'s question, against the pom.
+- **A gate that stops can only reach a person through the pull request**, and `gh pr create` with
+  `${{ github.token }}` is refused unless the organization allows Actions to create pull requests -
+  `GraphQL: GitHub Actions is not permitted to create or approve pull requests`, both update runs of
+  2026-09-21. The licence gate in `sokar-pi` fired correctly and its reason died in the runner. Ways
+  out: the setting, or the request step prefers `secrets.SOKAR_UPDATE_TOKEN` as the merge step does.
 - The agent's own facts live in `src/main/resources/agent/omp.yaml`. Nothing outside `agents/` in
   Sokar knows this agent's wording, and nothing here hardcodes Sokar's.
