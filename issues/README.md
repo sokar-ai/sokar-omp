@@ -13,7 +13,7 @@ identity, not sequence.
 | [OM07](OM07-Fail-Acceptance-When-A-Release-Adds-A-Dialog.md) | blocked | Sokar B52 | The acceptance run fails when a release adds a first-run dialog. | 1 |
 | [OM08](OM08-Declare-Where-The-Session-Id-Is.md) | blocked | Sokar B46 | Declaring where this agent's session id is, so a task that comes back continues its conversation. | 2 |
 | [OM04](OM04-Can-A-Subscription-Provider-Be-Brokered.md) | open | — | Whether any of this agent's subscription providers can be reached through a broker, which is the reason it was built. | 1 |
-| [OM14](OM14-Record-The-Fetched-Binary-In-The-Bill.md) | open | — | The bill of materials names five Java libraries and not the binary this package installs, so the licence gate compares nothing that an upstream release can change. | 1 |
+| [OM14](OM14-Record-The-Fetched-CLIs-License.md) | open | — | The fetched binary is in the bill but carries no license, so a release that relicenses itself passes the gate. | 1 |
 
 **Status** means: `open` - nobody is on it. `in progress` - somebody is. `handed on` - the work
 belongs to another repository and this row tracks what has to change here afterwards. `blocked` -
