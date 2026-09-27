@@ -36,6 +36,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Added
 
+- The bill records the pinned Oh My Pi's license, read per release from GitHub, so a release that changes it stops the update.
 - The build refuses an issue number that names no issue, so a citation in prose cannot outlive the issue it points at.
 - The build refuses a link to an issue file from anywhere but the index, so a pointer cannot outlive the issue it names.
 - The packages provide `sokar-agent`, so the setup script and the daemon list this agent as one a person can choose.
@@ -52,6 +53,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Fixed
 
+- The native binary starts on any x86-64 CPU; it needed AVX2, so on a pre-Haswell host or a VM with a conservative CPU model the package installed and then would not start.
 - The unit suite no longer pins the upstream version in an assertion, which made every automated update fail with "expected 18.1.13 but was 18.2.7".
 - The packages declare the glibc (2.34) and zlib the native binary links against, and the build fails when the binary needs more.
 - The build's index check follows Artifactory's redirect to cloud storage; it had read every package as not indexed.

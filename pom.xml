@@ -56,6 +56,7 @@
         <sokar.release.definition>src/main/resources/agent/omp.yaml</sokar.release.definition>
         <sokar.release.upstream>github-latest https://api.github.com/repos/can1357/oh-my-pi/releases/latest</sokar.release.upstream>
         <sokar.release.digest>sums https://github.com/can1357/oh-my-pi/releases/download/v{version}/SHA256SUMS.txt omp-linux-x64</sokar.release.digest>
+        <sokar.release.license>github-license https://api.github.com/repos/can1357/oh-my-pi/license?ref=v{version}</sokar.release.license>
 
         <!-- The published contract this builds against. Nothing else of Sokar's is on the
              classpath, and no checkout of the sokar repository is needed to build here. -->
@@ -232,6 +233,12 @@
                                 <configuration>
                                     <imageName>sokar-agent-omp</imageName>
                                     <mainClass>org.fuin.sokar.agent.impl.omp.OmpAgent</mainClass>
+                                    <!-- The x86-64 baseline, by the operator's decision: native-image's default is v3,
+                                         and a CPU or VM without AVX2 would install the package and not start it.
+                                         NativeLinkageCheck holds the binary to exactly the baseline. -->
+                                    <buildArgs>
+                                        <buildArg>-march=x86-64</buildArg>
+                                    </buildArgs>
                                 </configuration>
                             </execution>
                         </executions>

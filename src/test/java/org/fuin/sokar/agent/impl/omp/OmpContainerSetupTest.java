@@ -1,11 +1,15 @@
 package org.fuin.sokar.agent.impl.omp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Map;
+import org.fuin.sokar.agent.api.AgentException;
 import org.fuin.sokar.agent.api.ContainerFile;
 import org.fuin.sokar.agent.api.SetupContext;
 import org.junit.jupiter.api.Test;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Tests for {@link OmpContainerSetup}.
@@ -75,9 +79,11 @@ class OmpContainerSetupTest {
                 "tok\"en\\with\nquotes", "api-key", "/workspace", "http://127.0.0.1:9419",
                 "openrouter"));
 
-        assertThat(named(files, OmpModelsFile.PATH).content())
-                .as("written as a JSON literal, which YAML reads as a double-quoted scalar")
-                .contains("\"tok\\\"en\\\\with\\nquotes\"");
+        // Read back as a YAML reader reads it: the claim is that the token arrives intact, not that
+        // some escape appears in the text.
+        final Map<?, ?> providers = (Map<?, ?>) new Yaml().<Map<?, ?>>load(named(files, OmpModelsFile.PATH).content())
+                .get("providers");
+        assertThat(((Map<?, ?>) providers.get("openrouter")).get("apiKey")).isEqualTo("tok\"en\\with\nquotes");
     }
 
     @Test
@@ -104,9 +110,18 @@ class OmpContainerSetupTest {
 
         // Configuration, not a credential: it holds nothing worth hiding, and it applies to an
         // agent that was given no endpoint as much as to one that was.
-        final ContainerFile config = named(files(""), OmpConfigFile.PATH);
+        assertThat(named(files(""), OmpConfigFile.PATH).ownerOnly()).isFalse();
+        assertThat(named(files("http://127.0.0.1:9419"), OmpConfigFile.PATH).ownerOnly()).isFalse();
+    }
 
-        assertThat(config.ownerOnly()).isFalse();
-        assertThat(OmpConfigFile.PATH).isNotEqualTo(OmpModelsFile.PATH);
+    @Test
+    void refusesABrokeredTaskWithoutAProvider() {
+
+        // Sokar never sends one: no provider chosen means no endpoint either. A file naming the
+        // provider "" would override nothing and fail as a wrong credential, so a blank one is
+        // Sokar's regression, and saying so is what would find it.
+        assertThatThrownBy(() -> new OmpContainerSetup().files(new SetupContext(
+                "sokar_pt_x", "api-key", "/workspace", "http://127.0.0.1:9419", " ")))
+                .isInstanceOf(AgentException.class).hasMessageContaining("empty provider");
     }
 }

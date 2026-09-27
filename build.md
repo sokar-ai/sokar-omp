@@ -117,9 +117,16 @@ off behind `SOKAR_UPDATE_AUTO_MERGE`, and needs `SOKAR_UPDATE_TOKEN` as well - a
 the workflow's own token triggers no build, so merging with it would publish nothing and report
 success.
 
+**A fact newly recorded in the bill stops the next update once.** The published bill does not have it
+yet, so the comparison sees it change from nothing - the license of the fetched CLI, added on
+2026-09-27, read as *relicensed* until a push published a bill that carried it. Expected, and cleared
+by publishing, not by approving the update.
+
 `PinAgreementTest` fails the unit tests when the filtered definition's version, the pom and
-the download URL disagree. The digest needs the network, so the release tool's `check-pin` still
-checks it on every push against the `SHA256SUMS.txt` upstream publishes.
+the download URL disagree. The license is written beside the digest, read from GitHub's license API at the release's tag, and
+lands in the bill, where the update gate stops on a change to it. The digest and the license need the
+network, so the release tool's `check-pin` still checks both on every push, against the
+`SHA256SUMS.txt` and the license upstream publishes.
 
 ## Publishing
 

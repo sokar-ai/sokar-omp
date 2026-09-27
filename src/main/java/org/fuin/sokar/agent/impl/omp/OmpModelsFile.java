@@ -8,7 +8,7 @@ import org.fuin.sokar.wire.Json;
  * omp cannot be redirected with an environment variable, and its extension API cannot do it
  * either: an extension calling {@code registerProvider(name, {baseUrl})} for a built-in provider
  * loads and runs, and the requests still go to the provider's own host. Measured against 18.1.13.
- * What does redirect it is {@code providers.&lt;name&gt;.baseUrl} in the models file, which is
+ * What does redirect it is {@code providers.<name>.baseUrl} in the models file, which is
  * data rather than code and is read before the first request.
  * <p>
  * Neither the provider's name nor the dialect's path is written here: the name arrives with the

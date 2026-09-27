@@ -5,7 +5,6 @@ identity, not sequence.
 
 | # | Status | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| [OM15](OM15-Check-The-Code-Against-The-House-Skills.md) | open | — | The Java read against the house skills, which a second author's list catches where the tests do not. | 0 |
 | [OM06](OM06-Check-What-Omp-Asks-At-First-Run.md) | open | — | Whether a fresh task shows anything before Oh My Pi starts work. Never checked. | 1 |
 | [OM01](OM01-Pin-GitHub-Actions-By-Sha.md) | handed on | — | Every third-party GitHub Action runs from a mutable tag, beside the tokens that publish packages and open pull requests. | 1 |
 | [OM03](OM03-Automated-Agent-Updates.md) | open | — | The update pipeline is built; what it still decides by convention rather than by a stated rule, including a cadence unlike the other two. | 6 |
@@ -13,7 +12,6 @@ identity, not sequence.
 | [OM07](OM07-Fail-Acceptance-When-A-Release-Adds-A-Dialog.md) | blocked | Sokar B52 | The acceptance run fails when a release adds a first-run dialog. | 1 |
 | [OM08](OM08-Declare-Where-The-Session-Id-Is.md) | blocked | Sokar B46 | Declaring where this agent's session id is, so a task that comes back continues its conversation. | 2 |
 | [OM04](OM04-Can-A-Subscription-Provider-Be-Brokered.md) | open | — | Whether any of this agent's subscription providers can be reached through a broker, which is the reason it was built. | 1 |
-| [OM14](OM14-Record-The-Fetched-CLIs-License.md) | open | — | The fetched binary is in the bill but carries no license, so a release that relicenses itself passes the gate. | 1 |
 
 **Status** means: `open` - nobody is on it. `in progress` - somebody is. `handed on` - the work
 belongs to another repository and this row tracks what has to change here afterwards. `blocked` -
