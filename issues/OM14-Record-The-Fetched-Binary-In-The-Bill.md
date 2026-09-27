@@ -13,7 +13,7 @@ thing this package exists to install, the pinned Oh My Pi binary, is not one of 
 5 components, against `sokar-pi`'s 140, because that repository builds an npm tree from a lockfile
 and this one fetches one file.
 
-So `buildtools/compare-bills.py` compares five Java libraries that an upstream release cannot
+So `compare-bills` compares five Java libraries that an upstream release cannot
 change, and the licence gate in `update.yml` is one the update can hardly ever trip. Its own step
 says so: *"A no-op today: this bill does not record the fetched binary, so nothing moves."* That was
 written as a statement of the present, and the present has not moved since.
@@ -30,7 +30,7 @@ binary is in the bill**, so the design anticipated this and the recording was ne
 
 - The bill names the pinned CLI as a component: its version, the URL it came from, the SHA-256 the
   definition pins, and the licence upstream declares.
-- `compare-bills.py` reports it as `moved` on a version bump rather than as one added and one
+- `compare-bills` reports it as `moved` on a version bump rather than as one added and one
   removed, which `--expect-moved omp` already does once the component exists.
 - A release whose licence changed stops the update, proven by running the comparison against a bill
   with the licence altered by hand.

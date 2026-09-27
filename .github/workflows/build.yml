@@ -36,8 +36,14 @@ jobs:
         run: ./mvnw -B -s settings.xml verify
 
       # A bump that forgets the digest builds and packages green, and fails at an image build.
+      # Sokar's release tool and the machine tooling, resolved once for every step that calls them.
+      - name: Resolve the release and machine tooling
+        run: |
+          ./mvnw -B -q -Pci-tools -s settings.xml dependency:build-classpath \
+              -Dmdep.outputFile=target/cp.txt
+
       - name: The pin agrees everywhere it is written
-        run: python3 buildtools/check-pin.py
+        run: java -cp "$(cat target/cp.txt)" org.fuin.sokar.release.Main check-pin
 
       # The packages are what an operator installs;
       # Not -DskipTests: that also skips NativeLinkageCheck, the one test that needs the binary.
@@ -157,7 +163,7 @@ jobs:
         run: |
           java -cp "$(cat target/cp.txt)" org.fuin.sokar.machines.Main acceptance \
               --os ${{ matrix.os }} --package sokar-agent-omp \
-              --script buildtools/acceptance.sh --cucumber .
+              --cucumber .
 
       - name: Delete what this run created
         if: always()

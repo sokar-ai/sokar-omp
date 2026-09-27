@@ -12,10 +12,13 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Removed
 
+- The Python release tools, `acceptance.sh` and `broker-check.sh`, which had drifted from or duplicated the other agent repositories.
 - The changelog check in CI; requiring an entry returns later, built on logchange.
 
 ### Changed
 
+- The build and the update job call Sokar's release tool instead of Python: recording the fetched binary in the bill, the upstream lookup, the pin move, the digest check on every push and the bill comparison.
+- The acceptance run is the Cucumber scenarios alone; they refuse to run as root, bring a vault of their own, check that the adapter installs what its bill names, and prove the brokering path with a fake key.
 - The pull request carries the third-party comparison itself, with each component's licence, rather than leaving it in the run log.
 - Issues carry their repository's letter: `OM07` rather than `007`, so a number says which set it belongs to.
 - The acceptance suite makes its project by following a local repository and names it on every task start; its cleanup asks Sokar to remove the project instead of deleting Sokar's directories.

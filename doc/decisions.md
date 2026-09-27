@@ -12,6 +12,7 @@ rather than guessed.
 
 | Date | What was decided |
 |---|---|
+| 2026-09-27 | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
 | 2026-09-18 | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installed anything |
 | 2026-09-13 | [The changelog check is removed, not replaced](#the-changelog-check-is-removed-not-replaced) - requiring an entry returns with Sokar B55, on logchange |
 | 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
@@ -19,6 +20,36 @@ rather than guessed.
 | 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
 | 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
 | 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+
+## The release tooling is Sokar's, configured from the pom
+
+**Decided 2026-09-27 with Agent Sokar**, when the shared `sokar-release` replaced the Python tools
+that had been copied into all three agent repositories and had already drifted between them.
+
+**What differs between agents is data**, and it lives in `pom.xml` as `sokar.release.*`, beside
+`agent.cli.version`: the label, the source definition, the newest GitHub release as upstream, and
+the `SHA256SUMS.txt` the digest is read from. Flags on each call would have put the same facts on
+every workflow line, and the second copy is the one that goes stale. At package time the tool is a
+plugin dependency of the exec plugin, not of the project, so it never reaches the bill of materials
+or the native image's classpath.
+
+**The digest parser must keep this matrix**, first run by hand against the Python parser on
+2026-09-12 and reproduced against the tool's `check-pin` on 2026-09-27, each row served as a
+`SHA256SUMS.txt`:
+
+| input | expected |
+|---|---|
+| one valid digest for the asset | accepted |
+| the asset absent from the body | refused, exit 1 |
+| two different digests for the asset | refused, exit 1 |
+| `abc123` | refused - not a digest |
+| 64 uppercase hex characters | refused - not lowercase |
+| the same digest twice | accepted |
+
+**Also measured before the Python was deleted:** `add-fetched-cli` wrote a document identical to the
+script's; `upstream-version` answered `rollback` for a newest release older than the pin;
+`check-pin` failed on a digest one character off; `compare-bills` stopped on a component the update
+did not name.
 
 ## omp does not check for a newer version in a task
 

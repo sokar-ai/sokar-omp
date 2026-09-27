@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * {@code describe} with - and not the source template, which would check the template and prove
  * nothing about the build. Whether the digest is the one upstream lists in the release's
  * {@code SHA256SUMS.txt} needs the network, so that question stays with
- * {@code buildtools/check-pin.py}, which still runs on every push.
+ * the {@code check-pin} of Sokar's release tool, which still runs on every push.
  * <p>
  * Each refusal below is reproduced from the real files rather than from a hand-written sample, so a
  * change to the definition's shape breaks the test instead of passing it.

@@ -51,6 +51,12 @@
              new digest from that release's SHA256SUMS.txt. Not part of the package version. -->
         <agent.cli.version>18.1.13</agent.cli.version>
 
+        <!-- What this agent's update differs in, read by Sokar's release tool beside the pin. -->
+        <sokar.release.agent>Oh My Pi</sokar.release.agent>
+        <sokar.release.definition>src/main/resources/agent/omp.yaml</sokar.release.definition>
+        <sokar.release.upstream>github-latest https://api.github.com/repos/can1357/oh-my-pi/releases/latest</sokar.release.upstream>
+        <sokar.release.digest>sums https://github.com/can1357/oh-my-pi/releases/download/v{version}/SHA256SUMS.txt omp-linux-x64</sokar.release.digest>
+
         <!-- The published contract this builds against. Nothing else of Sokar's is on the
              classpath, and no checkout of the sokar repository is needed to build here. -->
         <sokar.version>0.1.0-SNAPSHOT</sokar.version>
@@ -259,16 +265,30 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${project.basedir}/buildtools/add-fetched-cli.py</executable>
+                                    <executable>${java.home}/bin/java</executable>
+                                    <!-- Puts sokar-release, a plugin dependency, on the classpath
+                                         below, so it never becomes a dependency of the package. -->
+                                    <includePluginDependencies>true</includePluginDependencies>
                                     <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>org.fuin.sokar.release.Main</argument>
+                                        <argument>add-fetched-cli</argument>
                                         <argument>${project.build.directory}/${project.artifactId}.cdx.json</argument>
                                         <argument>${project.build.outputDirectory}/agent/omp.yaml</argument>
-                                        <!-- The name compare-bills.py is told to expect moving. -->
+                                        <!-- The name compare-bills is told to expect moving. -->
                                         <argument>omp</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
                         </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.fuin.sokar</groupId>
+                                <artifactId>sokar-release</artifactId>
+                                <version>${sokar.version}</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
 
                     <plugin>
@@ -480,6 +500,10 @@
                 <dependency>
                     <groupId>org.fuin.sokar</groupId>
                     <artifactId>sokar-machines</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.fuin.sokar</groupId>
+                    <artifactId>sokar-release</artifactId>
                 </dependency>
             </dependencies>
         </profile>

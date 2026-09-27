@@ -234,12 +234,14 @@ request   POST /api/v1/responses -> 401 from the provider
 
 ## What has been checked
 
-`buildtools/broker-check.sh` runs a real task with a **deliberately fake**
+`src/acceptance/.../broker.feature` runs a real task with a **deliberately fake**
 OpenRouter key and asserts the whole path around the credential: the models file
 is in the container, `0600`, carrying a phantom token; the real key is in neither
 the environment nor the file; and the request reached the provider through the
 broker. The provider's 401 is the proof — it is OpenRouter's rejection of a bad
 key, not the proxy's rejection of the token, so every hop ran.
+
+What the shell script it replaced printed, the day brokering was first proven:
 
 ```
 $ buildtools/broker-check.sh

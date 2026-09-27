@@ -5,6 +5,9 @@ Feature: The published package on a clean machine
   operator installs them - and this agent's binary was built in another repository against a
   published contract, so sokar has never heard of it.
 
+  Background:
+    Given the suite runs as an unprivileged user
+
   Scenario: sokar is installed and discovers the agent it was never linked against
     When a script runs "sokar --version"
     Then it exits zero
@@ -29,3 +32,18 @@ Feature: The published package on a clean machine
     # A flat snapshot is the same version every build, so 'apt upgrade' has nothing to do and
     # whoever installed yesterday stays there. Asked of dpkg or rpm, not reasoned about.
     Then the installed package "sokar-agent-omp" is a snapshot that the next build supersedes
+
+  Scenario: the package carries a bill naming what it installs
+    # Checked on a machine that installed the package rather than in the build that made it: an
+    # update gate diffs this against the published one, and a missing bill breaks it silently.
+    Then the bill at "/usr/share/sokar/sbom/sokar-agent-omp.cdx.json" names "omp"
+
+  Scenario: the adapter installs the Oh My Pi its bill names
+    # Two facts written by two different steps of the build; an image installs one and the
+    # update gate compares the other.
+    Then the "omp" agent installs the version the bill at "/usr/share/sokar/sbom/sokar-agent-omp.cdx.json" names for "omp"
+
+  Scenario: an update run installs the version it was asked to test
+    # Set only by the update job, which tests its candidate packages rather than the published ones.
+    Given the environment variable "SOKAR_E2E_EXPECT_CLI" is set
+    Then the "omp" agent installs the version in the environment variable "SOKAR_E2E_EXPECT_CLI"

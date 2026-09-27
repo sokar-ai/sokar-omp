@@ -9,10 +9,10 @@ or the divergence should be deliberate.
 
 ## What is already built here
 
-Detect, apply, verify, publish all exist: `buildtools/upstream-version.py` reads the newest GitHub
-release, `buildtools/update.py` moves the pin - and since 2026-09-12 refuses a malformed or
-duplicated upstream digest before writing it - `buildtools/check-pin.py` refuses a disagreement,
-and `buildtools/compare-bills.py` stops a release that changes what third-party code ships.
+Detect, apply, verify, publish all exist, as commands of Sokar's release tool: `upstream-version`
+reads the newest GitHub release, `update` moves the pin - refusing a malformed or duplicated
+upstream digest before writing it - `check-pin` refuses a disagreement, and `compare-bills` stops a
+release that changes what third-party code ships.
 
 So this issue is not "build the pipeline". It is the set of questions the pipeline still answers by
 convention rather than by a stated rule.

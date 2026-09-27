@@ -58,13 +58,12 @@ Three things, in the order they are worth running.
    the command line, the definition, and the file the adapter writes into a
    container, including a token containing quotes and newlines.
 
-2. **`buildtools/broker-check.sh`** — a real task on an installed Sokar, with a
+2. **The `broker.feature` scenario** — a real task on an installed Sokar, with a
    deliberately fake OpenRouter key. It asserts everything around the credential:
    the file is in the container and `0600`, it carries a phantom token, the real
    key is in neither the environment nor the file, and the request reached the
    provider through the broker. The provider's 401 is what proves the chain ran.
-   Needs podman and `sokar setup`; it uses a vault of its own and removes what it
-   created.
+   Needs no account; it uses a vault of its own and removes what it created.
 
 3. **Sokar's own `buildtools/e2e-tier1.sh`**, pointed here:
 
@@ -96,15 +95,15 @@ OpenRouter account.
 **One sentence per change** - it is a compressed summary of the commits it covers, and
 `git log` is where anyone who wants the reasoning goes.
 
-A version bump is not written by hand: `buildtools/update.py` writes its own line and replaces
+A version bump is not written by hand: the `update` of Sokar's release tool writes its own line and replaces
 the one it wrote last time. Everything else is by hand, and since 2026-09-13 nothing checks for
 it; requiring an entry returns with Sokar B55 - see [`doc/decisions.md`](doc/decisions.md).
 
 ## Following Oh My Pi without watching it
 
 `.github/workflows/update.yml` runs once a week, on Monday. It asks GitHub for the newest
-release and, if that is not what this module pins, does what a person would: `update.py`,
-rebuild, and prove the result on a real Ubuntu machine and a real Fedora one **before anything
+release and, if that is not what this module pins, does what a person would: the release tool's
+`update`, rebuild, and prove the result on a real Ubuntu machine and a real Fedora one **before anything
 is published**.
 
 **There is no stable channel here.** Claude Code publishes `stable` beside `latest`, so that
@@ -119,7 +118,7 @@ the workflow's own token triggers no build, so merging with it would publish not
 success.
 
 `PinAgreementTest` fails the unit tests when the filtered definition's version, the pom and
-the download URL disagree. The digest needs the network, so `buildtools/check-pin.py` still
+the download URL disagree. The digest needs the network, so the release tool's `check-pin` still
 checks it on every push against the `SHA256SUMS.txt` upstream publishes.
 
 ## Publishing
@@ -161,6 +160,5 @@ suite - typed into the vault at a terminal, never on a command line - and are **
 passed, without them. There is no glue class here: every step is the kit's, which is what keeps
 this repository free of test code that knows about ssh.
 
-In CI the same suite runs from the runner against the rented machine on every push to `main`,
-beside `buildtools/acceptance.sh` until it has been green there for real; see the comment in
-`.github/workflows/build.yml`. A run that produces no scenarios fails rather than passing quietly.
+In CI the same suite runs from the runner against the rented machine on every push to `main`.
+A run that produces no scenarios fails rather than passing quietly.
