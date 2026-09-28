@@ -54,7 +54,7 @@ checked where it is used, at image-build time, where a mismatch fails the layer.
 
 Three things, in the order they are worth running.
 
-1. **`./mvnw -s settings.xml verify`** — 14 unit tests. They cover the shape of
+1. **`./mvnw -s settings.xml verify`** — the unit tests. They cover the shape of
    the command line, the definition, and the file the adapter writes into a
    container, including a token containing quotes and newlines.
 
@@ -86,8 +86,8 @@ Three things, in the order they are worth running.
    socket or base-URL variable in the container, and an agent pointed at a broker
    by a file has neither; `sokar-agent-pi` fails it identically.
 
-What none of them checks is that a **valid** key gets a 200. That needs an
-OpenRouter account.
+That a **valid** key gets an answer is what the `@credential` scenarios below check,
+and only they: they need an OpenRouter account.
 
 ## The changelog
 
@@ -96,8 +96,8 @@ OpenRouter account.
 `git log` is where anyone who wants the reasoning goes.
 
 A version bump is not written by hand: the `update` of Sokar's release tool writes its own line and replaces
-the one it wrote last time. Everything else is by hand, and since 2026-09-13 nothing checks for
-it; requiring an entry returns with Sokar B55 - see [`doc/decisions.md`](doc/decisions.md).
+the one it wrote last time. Everything else is by hand, and nothing checks for
+it; requiring an entry comes with Sokar B55 - see [`doc/decisions.md`](doc/decisions.md).
 
 ## Following Oh My Pi without watching it
 
@@ -117,10 +117,10 @@ off behind `SOKAR_UPDATE_AUTO_MERGE`, and needs `SOKAR_UPDATE_TOKEN` as well - a
 the workflow's own token triggers no build, so merging with it would publish nothing and report
 success.
 
-**A fact newly recorded in the bill stops the next update once.** The published bill does not have it
-yet, so the comparison sees it change from nothing - the license of the fetched CLI, added on
-2026-09-27, read as *relicensed* until a push published a bill that carried it. Expected, and cleared
-by publishing, not by approving the update.
+**A fact newly recorded in the bill stops the next update once.** The published bill does not carry
+it, so the comparison sees it change from nothing - a license field appearing reads as *relicensed*.
+That is expected, and it is cleared by publishing a bill that carries the fact, not by approving the
+update.
 
 `PinAgreementTest` fails the unit tests when the filtered definition's version, the pom and
 the download URL disagree. The license is written beside the digest, read from GitHub's license API at the release's tag, and
@@ -171,8 +171,8 @@ this repository free of test code that knows about ssh.
 vault brings its own - a temporary file and a passphrase the scenario states - and the kit then checks
 the passphrase never appears on screen. The rented machine's account is named `acceptance`, and
 Ubuntu 26.04's shell integration prints `user=acceptance` in its escape sequences, so a passphrase of
-`acceptance` reads as echoed. That failed every such scenario on Hetzner on 2026-09-27 while the VMs,
-whose account is `claude`, stayed green.
+`acceptance` reads as echoed and fails the scenario - on the rented machines only, where the account
+has that name.
 
 In CI the same suite runs from the runner against the rented machine on every push to `main`.
 A run that produces no scenarios fails rather than passing quietly.

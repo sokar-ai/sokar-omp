@@ -201,10 +201,9 @@ Take the `omp-linux-x64` line — the glibc build, which is what a task image on
 `ubuntu:24.04` runs. The digest is the publisher's, so this is verifiable rather
 than trusted, and `OmpAgentTest` fails if the URL and the version stop agreeing.
 
-**The releases are frequent.** npm lists 617 versions of
-`@oh-my-pi/pi-coding-agent` up to and including 18.1.13, three of them on three
-consecutive days. Being a fork of Pi says nothing about its cadence: Pi was on
-0.85.0 at the same moment.
+**The releases are frequent** - hundreds of versions of `@oh-my-pi/pi-coding-agent`
+on npm, often one a day. Being a fork of Pi says nothing about its cadence: Pi is
+still before 1.0.
 
 `sokar agents --supply-chain` reports what is pinned, so "which version ran" is
 answerable from the installed adapter rather than from a build log.
@@ -241,19 +240,6 @@ the environment nor the file; and the request reached the provider through the
 broker. The provider's 401 is the proof — it is OpenRouter's rejection of a bad
 key, not the proxy's rejection of the token, so every hop ran.
 
-What the shell script it replaced printed, the day brokering was first proven:
-
-```
-$ buildtools/broker-check.sh
-  PASS  the agent's own setup file is in the container (/home/agent/.omp/agent/models.yml)
-  PASS  it carries a task-scoped token
-  PASS  it is readable only by the agent user (600 agent)
-  PASS  the real credential is not in the container's environment or its setup file
-  PASS  omp's requests went through the broker
-        | request   GET /api/v1/models -> 200 from the provider
-        | request   POST /api/v1/responses -> 401 from the provider
-```
-
 Sokar's own `buildtools/e2e-tier1.sh` drives this agent with
 `SOKAR_E2E_AGENT=omp SOKAR_E2E_AGENT_MODULE=<path to this checkout>`, and covers
 what this script does not: the image build, the pinned version, container
@@ -262,6 +248,7 @@ here**, and that is a gap in the check rather than in the agent: it looks for a
 socket or base-URL variable in the container, and an agent pointed at a broker by
 a file has neither. `sokar-agent-pi` fails the same check for the same reason.
 
-What is **not** checked anywhere yet: that a valid key gets a 200. That needs an
-OpenRouter account, and it is the one thing above the fake credential cannot
-stand in for.
+That a **valid** key gets an answer is what `credential.feature` checks: tagged
+`@credential`, it runs a task with a real OpenRouter key, attended and headless, and
+waits for the model to answer through the broker. It needs an OpenRouter account,
+which is the one thing the fake credential above cannot stand in for.

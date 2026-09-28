@@ -36,6 +36,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Added
 
+- The build refuses a main package that is not null-marked, so NullAway cannot skip one in silence.
 - The compile checks the package's nullness contract with NullAway, so returning null where a type promises a value fails the build.
 - The bill records the pinned Oh My Pi's license, read per release from GitHub, so a release that changes it stops the update.
 - The build refuses an issue number that names no issue, so a citation in prose cannot outlive the issue it points at.

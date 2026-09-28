@@ -6,71 +6,54 @@ somebody would otherwise ask "why is it like this?" and find only code.
 Accepted risks live here too. An accepted risk is not a forgotten one: it says what the exposure
 is, why it is not being removed, and what would change the answer.
 
-Newest first, and in the order they stand below. The date is when the decision was taken,
-not when its row was written - the older ones were found with `git log -S` on the sentence
-rather than guessed.
+Ordered by what each decision covers: what the package is, how the agent is pointed at the broker,
+what it may do in a task, how it is built and updated, and the risks accepted on the way.
 
-| Date | What was decided |
+| What it covers | What holds |
 |---|---|
-| 2026-09-28 | [NullAway is configured in this pom, not in the shared parent](#nullaway-is-configured-in-this-pom-not-in-the-shared-parent) - the parent is not this repository's to change |
-| 2026-09-27 | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
-| 2026-09-18 | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installed anything |
-| 2026-09-13 | [The changelog check is removed, not replaced](#the-changelog-check-is-removed-not-replaced) - requiring an entry returns with Sokar B55, on logchange |
-| 2026-09-12 | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
-| 2026-09-12 | [What the acceptance actually proved, and with what](#what-the-acceptance-actually-proved-and-with-what) - Fedora 44, the installed package, a real credential |
-| 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
-| 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
-| 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+| The package | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - about 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+| The package | [What the acceptance proves, and with what](#what-the-acceptance-proves-and-with-what) - Fedora 44, the installed package, a real credential |
+| The broker | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - the extension loads and does not redirect; a file does |
+| The task | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installs anything |
+| Updates | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - many releases to Pi's few, so no rule follows from a shared origin |
+| The build | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
+| The build | [NullAway is configured in this pom, not in the shared parent](#nullaway-is-configured-in-this-pom-not-in-the-shared-parent) - the parent is not this repository's to change |
+| The build | [The changelog is written by hand, and nothing enforces it](#the-changelog-is-written-by-hand-and-nothing-enforces-it) - requiring an entry comes with Sokar B55, on logchange |
+| Risk | [Accepted risk: the release binary and its digest share one trust root](#accepted-risk-the-release-binary-and-its-digest-share-one-trust-root) - nothing independent to verify the download against, and why that stays |
 
-## NullAway is configured in this pom, not in the shared parent
+## Why the package is small and the download is not
 
-**Decided 2026-09-28 by the operator**, closing the question of where the nullness check lives.
+The package is about 6 MB because it fetches upstream's self-contained 200 MB binary at image-build
+time and checks it against the digest upstream publishes, rather than carrying it. The trade is
+recorded in the accepted risk below: one trust root for both the binary and its digest.
 
-`org.fuin:pom` would make it true in every repository at once, but it is not this repository's to
-change, and waiting for it would have left the `@NullMarked` promise unchecked for as long as that
-took. So the compiler configuration, the two versions and `.mvn/jvm.config` are here, identical in
-`sokar-claude-code` and `sokar-pi`. Three copies of one block is the shape `AGENTS.md` warns about; it is
-accepted because the parent is the one place that removes it, and **moving it there is the answer
-the day the parent takes it** - then all three copies go in the same change.
+## What the acceptance proves, and with what
 
-Only the `default-compile` execution runs it: tests pass `null` on purpose, and Error Prone never
-sees them. `.mvn/jvm.config` exists because Error Prone runs inside javac in Maven's own JVM, and
-since JDK 16 that JVM refuses it the compiler's internals - measured 2026-09-28 on JDK 25, an
-`IllegalAccessError` on `com.sun.tools.javac.api` before a single file was checked.
+Run whole on **Fedora 44** against the installed `.rpm` with a **real OpenRouter key**:
 
-## The release tooling is Sokar's, configured from the pom
+- both packages install from the package repository rather than from a build tree;
+- `sokar` discovers an agent it was never linked against;
+- **the agent authenticates against the provider and completes a prompt**;
+- the container holds no credential but the task-scoped token;
+- and the key appears in no log the run produces.
 
-**Decided 2026-09-27 with Agent Sokar**, when the shared `sokar-release` replaced the Python tools
-that had been copied into all three agent repositories and had already drifted between them.
+Also measured: the digest matching upstream's published sum; `omp --version` on a stock
+`ubuntu:24.04` with nothing added; the broker path end to end with a deliberately fake key, ending
+in the provider's own 401 rather than the proxy's; and coexistence with Pi, whose tree is nearly
+identical under a different name and is exactly where a collision would hide.
 
-**What differs between agents is data**, and it lives in `pom.xml` as `sokar.release.*`, beside
-`agent.cli.version`: the label, the source definition, the newest GitHub release as upstream, and
-the `SHA256SUMS.txt` the digest is read from. Flags on each call would have put the same facts on
-every workflow line, and the second copy is the one that goes stale. At package time the tool is a
-plugin dependency of the exec plugin, not of the project, so it never reaches the bill of materials
-or the native image's classpath.
+## A fork is not a promise: how this agent is pointed at the broker
 
-**The digest parser must keep this matrix**, first run by hand against the Python parser on
-2026-09-12 and reproduced against the tool's `check-pin` on 2026-09-27, each row served as a
-`SHA256SUMS.txt`:
+Oh My Pi is a fork of Pi, and sharing an origin does not mean sharing a mechanism.
+**`registerProvider` survives the fork** - same name, compatible signature - **and it does not
+redirect a built-in provider** in 18.1.13. Measured: the extension loads, runs, writes its marker,
+and requests still go to `openrouter.ai`.
 
-| input | expected |
-|---|---|
-| one valid digest for the asset | accepted |
-| the asset absent from the body | refused, exit 1 |
-| two different digests for the asset | refused, exit 1 |
-| `abc123` | refused - not a digest |
-| 64 uppercase hex characters | refused - not lowercase |
-| the same digest twice | accepted |
-
-**Also measured before the Python was deleted:** `add-fetched-cli` wrote a document identical to the
-script's; `upstream-version` answered `rollback` for a newest release older than the pin;
-`check-pin` failed on a digest one character off; `compare-bills` stopped on a component the update
-did not name.
+What works is `providers.<name>.baseUrl` in `~/.omp/agent/models.yml`, so the container is pointed
+at the broker **by a file rather than by a variable or an extension**. The packaging this agent
+shares with Pi matters more than the mechanism it does not.
 
 ## omp does not check for a newer version in a task
-
-**Decided 2026-09-18 by the operator**, after Claude Code was found updating itself inside a task.
 
 **Read in the pinned 18.1.13, not run:** with `startup.checkUpdate` on, which is the default, omp
 asks the npm registry or GitHub for a newer release at start and shows a notice. It installs nothing
@@ -87,24 +70,66 @@ task reaches neither host.
 **What would change it:** an omp release that installs updates by itself, or a switch for
 `omp update`.
 
-## The changelog check is removed, not replaced
+## Its release cadence is unlike the other two
 
-**Decided 2026-09-13 by the operator**, across all Sokar repositories.
+Hundreds of npm versions against Pi's pre-1.0 handful, often a release a day. Nothing in the
+update pipeline can be shared with Pi on the grounds of the two being the same project, and any
+ageing rule the other agents adopt needs its own answer here - see OM03 in the
+[issue index](../issues/README.md).
 
-`buildtools/check-changelog.py` failed a push whose code change did not touch `CHANGELOG.md`. It is
-deleted, and nothing replaces it for now. Sokar is moving to logchange - one YAML file per change,
-and a generated `CHANGELOG.md` - and a check for a hand-kept file would have to be rebuilt the moment
-that reaches this repository. Requiring an entry returns as Sokar B55, proposed to logchange upstream
-first, which keeps the three lessons the script carried: a waiver answers for its own commit only,
-documentation is not exempt, and a range that cannot be compared fails.
+## The release tooling is Sokar's, configured from the pom
 
-**Until then** the changelog is still written by hand in the same commit; only the enforcement is gone.
+The release tooling is the shared `sokar-release`, not a copy in each agent repository: copies of
+one tool drift apart.
+
+**What differs between agents is data**, and it lives in `pom.xml` as `sokar.release.*`, beside
+`agent.cli.version`: the label, the source definition, the newest GitHub release as upstream, and
+the `SHA256SUMS.txt` the digest is read from. Flags on each call would put the same facts on every
+workflow line, and the second copy is the one that goes stale. At package time the tool is a
+plugin dependency of the exec plugin, not of the project, so it never reaches the bill of materials
+or the native image's classpath.
+
+**The digest parser must keep this matrix**, each row served as a `SHA256SUMS.txt` to the tool's
+`check-pin`:
+
+| input | expected |
+|---|---|
+| one valid digest for the asset | accepted |
+| the asset absent from the body | refused, exit 1 |
+| two different digests for the asset | refused, exit 1 |
+| `abc123` | refused - not a digest |
+| 64 uppercase hex characters | refused - not lowercase |
+| the same digest twice | accepted |
+
+**Also measured of the tool:** `add-fetched-cli` writes the bill entry for the fetched binary;
+`upstream-version` answers `rollback` for a newest release older than the pin; `check-pin` fails on
+a digest one character off; `compare-bills` stops on a component the update did not name.
+
+## NullAway is configured in this pom, not in the shared parent
+
+`org.fuin:pom` would make it true in every repository at once, but it is not this repository's to
+change, and waiting for it would leave the `@NullMarked` promise unchecked. So the compiler
+configuration, the two versions and `.mvn/jvm.config` are here, identical in `sokar-claude-code` and
+`sokar-pi`. Three copies of one block is the shape `AGENTS.md` warns about; it is accepted because
+the parent is the one place that removes it, and **moving it there is the answer the day the parent
+takes it** - then all three copies go in the same change.
+
+Only the `default-compile` execution runs it: tests pass `null` on purpose, and Error Prone never
+sees them. `.mvn/jvm.config` exists because Error Prone runs inside javac in Maven's own JVM, and
+from JDK 16 on that JVM refuses it the compiler's internals - measured on JDK 25, an
+`IllegalAccessError` on `com.sun.tools.javac.api` before a single file is checked.
+
+## The changelog is written by hand, and nothing enforces it
+
+The changelog is written by hand in the same commit as the change, and no check requires it. A
+check for a hand-kept file would have to be rebuilt as soon as Sokar's move to logchange - one YAML
+file per change, and a generated `CHANGELOG.md` - reaches this repository. Requiring an entry comes
+with Sokar B55, proposed to logchange upstream, which keeps three lessons: a waiver answers for its
+own commit only, documentation is not exempt, and a range that cannot be compared fails.
 
 **What would change it:** B55 landing, or logchange being adopted here.
 
 ## Accepted risk: the release binary and its digest share one trust root
-
-**Decided:** 2026-09-12, from the security review in `.codex-review.md` (O-03).
 
 This package installs the Oh My Pi binary from that project's GitHub releases, pinned to a version
 and checked against a SHA-256 recorded in `agent/omp.yaml`. The digest that pin is compared with
@@ -126,49 +151,4 @@ workflow, which it does often.
 
 **What reduces it meanwhile:** the version is pinned rather than floating; the digest is checked
 before installation in the image layer; the update job opens a pull request rather than publishing
-by itself; and since 2026-09-12 the update script refuses a malformed or duplicated digest before
-writing it anywhere.
-
-## What the acceptance actually proved, and with what
-
-**Recorded 2026-09-12** from Sokar requirement A05 before it was retired. It is the only record of
-what was measured rather than assumed, and the requirement was about to take it with it.
-
-Run whole on **Fedora 44** against the installed `.rpm` with a **real OpenRouter key**:
-
-- both packages install from the package repository rather than from a build tree;
-- `sokar` discovers an agent it was never linked against;
-- **the agent authenticated against the provider and completed a prompt**;
-- the container held no credential but the task-scoped token;
-- and the key appeared in no log the run produced.
-
-Also measured: the digest matching upstream's published sum; `omp --version` on a stock
-`ubuntu:24.04` with nothing added; the broker path end to end with a deliberately fake key, ending
-in the provider's own 401 rather than the proxy's; and coexistence with Pi, whose tree is nearly
-identical under a different name and is exactly where a collision would have hidden.
-
-## A fork is not a promise: how this agent is pointed at the broker
-
-**Recorded 2026-09-12** when Sokar requirement A05 was retired into this repository. It is the
-finding that requirement got wrong, which is why it is worth keeping.
-
-The requirement reasoned that Oh My Pi inherits Pi's shape, so Pi's extension mechanism would be the
-first thing to try. **`registerProvider` does survive the fork** - same name, compatible signature -
-**and it does not redirect a built-in provider** in 18.1.13. Measured: the extension loads, runs,
-writes its marker, and requests still go to `openrouter.ai`.
-
-What works is `providers.<name>.baseUrl` in `~/.omp/agent/models.yml`, so the container is pointed
-at the broker **by a file rather than by a variable or an extension**. The packaging this agent
-shares with Pi turned out to matter more than the mechanism it does not.
-
-## Its release cadence is unlike the other two
-
-617 npm versions against Pi's 0.85.0, and three releases on three consecutive days. Nothing in the
-update pipeline can be shared with Pi on the grounds of the two being the same project, and any
-ageing rule the other agents adopt needs its own answer here - see `issues/003`.
-
-## Why the package is small and the download is not
-
-The package is about 6 MB because it fetches upstream's self-contained 200 MB binary at image-build
-time and checks it against the digest upstream publishes, rather than carrying it. The trade is
-recorded in the accepted risk above: one trust root for both the binary and its digest.
+by itself; and the release tool refuses a malformed or duplicated digest before writing it anywhere.
