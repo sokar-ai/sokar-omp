@@ -5,7 +5,6 @@ identity, not sequence.
 
 | # | Status | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| [OM16](OM16-Check-Nullness-At-Compile-Time.md) | open | — | The package is @NullMarked but no build checks it; NullAway through Error Prone makes a broken nullness contract a compile error. | 1 |
 | [OM06](OM06-Check-What-Omp-Asks-At-First-Run.md) | open | — | Whether a fresh task shows anything before Oh My Pi starts work. Never checked. | 1 |
 | [OM01](OM01-Pin-GitHub-Actions-By-Sha.md) | handed on | — | Every third-party GitHub Action runs from a mutable tag, beside the tokens that publish packages and open pull requests. | 1 |
 | [OM03](OM03-Automated-Agent-Updates.md) | open | — | The update pipeline is built; what it still decides by convention rather than by a stated rule, including a cadence unlike the other two. | 6 |

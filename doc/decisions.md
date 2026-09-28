@@ -12,6 +12,7 @@ rather than guessed.
 
 | Date | What was decided |
 |---|---|
+| 2026-09-28 | [NullAway is configured in this pom, not in the shared parent](#nullaway-is-configured-in-this-pom-not-in-the-shared-parent) - the parent is not this repository's to change |
 | 2026-09-27 | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
 | 2026-09-18 | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installed anything |
 | 2026-09-13 | [The changelog check is removed, not replaced](#the-changelog-check-is-removed-not-replaced) - requiring an entry returns with Sokar B55, on logchange |
@@ -20,6 +21,22 @@ rather than guessed.
 | 2026-09-07 | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - measured 2026-09-07: the extension loads and does not redirect; a file does |
 | 2026-09-07 | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - 617 versions to Pi's one, so no rule follows from a shared origin |
 | 2026-09-07 | [Why the package is small and the download is not](#why-the-package-is-small-and-the-download-is-not) - 6 MB carrying a 200 MB fetch, checked against upstream's digest |
+
+## NullAway is configured in this pom, not in the shared parent
+
+**Decided 2026-09-28 by the operator**, closing the question of where the nullness check lives.
+
+`org.fuin:pom` would make it true in every repository at once, but it is not this repository's to
+change, and waiting for it would have left the `@NullMarked` promise unchecked for as long as that
+took. So the compiler configuration, the two versions and `.mvn/jvm.config` are here, identical in
+`sokar-claude-code` and `sokar-pi`. Three copies of one block is the shape `AGENTS.md` warns about; it is
+accepted because the parent is the one place that removes it, and **moving it there is the answer
+the day the parent takes it** - then all three copies go in the same change.
+
+Only the `default-compile` execution runs it: tests pass `null` on purpose, and Error Prone never
+sees them. `.mvn/jvm.config` exists because Error Prone runs inside javac in Maven's own JVM, and
+since JDK 16 that JVM refuses it the compiler's internals - measured 2026-09-28 on JDK 25, an
+`IllegalAccessError` on `com.sun.tools.javac.api` before a single file was checked.
 
 ## The release tooling is Sokar's, configured from the pom
 
