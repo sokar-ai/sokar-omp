@@ -15,6 +15,7 @@ what it may do in a task, how it is built and updated, and the risks accepted on
 | The package | [What the acceptance proves, and with what](#what-the-acceptance-proves-and-with-what) - Fedora 44, the installed package, a real credential |
 | The broker | [A fork is not a promise: how this agent is pointed at the broker](#a-fork-is-not-a-promise-how-this-agent-is-pointed-at-the-broker) - the extension loads and does not redirect; a file does |
 | The task | [omp does not check for a newer version in a task](#omp-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installs anything |
+| The task | [omp starts at its prompt: the setup wizard is marked done](#omp-starts-at-its-prompt-the-setup-wizard-is-marked-done) - a five-step wizard opens even with a credential; setupVersion: 2 answers it |
 | Updates | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - many releases to Pi's few, so no rule follows from a shared origin |
 | The build | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
 | The build | [NullAway is configured in this pom, not in the shared parent](#nullaway-is-configured-in-this-pom-not-in-the-shared-parent) - the parent is not this repository's to change |
@@ -69,6 +70,19 @@ task reaches neither host.
 
 **What would change it:** an omp release that installs updates by itself, or a switch for
 `omp update`.
+
+## omp starts at its prompt: the setup wizard is marked done
+
+**A fresh omp opens at a five-step setup wizard** - providers to sign in to, the default model, glyph
+mode, composer layout, theme - **even with a credential in place.** Attended, the task then waits at
+a menu. Skipping every step writes `setupVersion: 2` to `~/.omp/agent/config.yml` and nothing else
+that changes behavior; the rest is session state. So the config file this adapter writes carries
+that line, and omp starts at its prompt.
+
+Measured on 18.1.13 at a terminal, a fresh task per run: without the line, the wizard; with it, the
+prompt - with a credential, and without one (omp started by hand in a task with a shell attached,
+since Sokar does not start the agent without a credential; it then warns that no model is
+available). **Headless**, a prompt run answers and exits either way: the wizard is attended only.
 
 ## Its release cadence is unlike the other two
 

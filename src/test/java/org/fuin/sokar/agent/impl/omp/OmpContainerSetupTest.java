@@ -102,7 +102,16 @@ class OmpContainerSetupTest {
         // Measured on 18.1.13: with this file 'omp config get startup.checkUpdate' answers false,
         // without it true. The check only shows a notice, and in a task it cannot reach its hosts.
         assertThat(named(files("http://127.0.0.1:9419"), OmpConfigFile.PATH).content())
-                .isEqualTo("startup:\n  checkUpdate: false\n");
+                .contains("startup:\n  checkUpdate: false\n");
+    }
+
+    @Test
+    void marksTheSetupWizardDone() {
+
+        // Measured on 18.1.13: a fresh task opens at a five-step setup wizard - providers, default
+        // model, glyphs, layout, theme - even with a credential in place. Skipping it writes
+        // setupVersion: 2 here and nothing else that matters; with that line the prompt comes first.
+        assertThat(named(files(""), OmpConfigFile.PATH).content()).contains("setupVersion: 2\n");
     }
 
     @Test

@@ -10,6 +10,12 @@ package org.fuin.sokar.agent.impl.omp;
  * the task cannot reach where it downloads from. Measured against 18.1.13 with
  * {@code omp config get startup.checkUpdate}.
  * <p>
+ * <strong>No setup wizard.</strong> A fresh omp opens at a five-step wizard - providers, default
+ * model, glyphs, layout, theme - even with a credential in place, and a task started attended then
+ * waits at a menu. Skipping every step writes {@code setupVersion: 2} to this file and nothing else
+ * that matters, and with that line omp starts at its prompt. Measured against 18.1.13 at a terminal,
+ * in a fresh task, with and without the line.
+ * <p>
  * Kept apart from {@link OmpModelsFile}, which holds a token and is written only when a task is
  * brokered: this file is plain configuration and belongs in every container.
  */
@@ -31,6 +37,7 @@ final class OmpConfigFile {
         return """
                 startup:
                   checkUpdate: false
+                setupVersion: 2
                 """;
     }
 }

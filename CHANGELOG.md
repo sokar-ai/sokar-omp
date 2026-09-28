@@ -55,6 +55,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Fixed
 
+- An attended task starts at Oh My Pi's prompt instead of its five-step setup wizard.
 - The native binary starts on any x86-64 CPU; it needed AVX2, so on a pre-Haswell host or a VM with a conservative CPU model the package installed and then would not start.
 - The unit suite no longer pins the upstream version in an assertion, which made every automated update fail with "expected 18.1.13 but was 18.2.7".
 - The packages declare the glibc (2.34) and zlib the native binary links against, and the build fails when the binary needs more.
