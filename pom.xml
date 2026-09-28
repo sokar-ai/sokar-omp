@@ -49,7 +49,7 @@
         <!-- The Oh My Pi version this package installs. Filtered into omp.yaml and carried in
              the package description, so 'dpkg -s' and 'rpm -qi' answer it. Bumping it means the
              new digest from that release's SHA256SUMS.txt. Not part of the package version. -->
-        <agent.cli.version>18.1.13</agent.cli.version>
+        <agent.cli.version>18.4.1</agent.cli.version>
 
         <!-- What this agent's update differs in, read by Sokar's release tool beside the pin. -->
         <sokar.release.agent>Oh My Pi</sokar.release.agent>

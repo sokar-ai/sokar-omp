@@ -17,6 +17,7 @@ appears as an entry rather than a heading. One sentence per change - `git log` h
 
 ### Changed
 
+- Oh My Pi pinned to 18.4.1 (was 18.1.13).
 - The build and the update job call Sokar's release tool instead of Python: recording the fetched binary in the bill, the upstream lookup, the pin move, the digest check on every push and the bill comparison.
 - The acceptance run is the Cucumber scenarios alone; they refuse to run as root, bring a vault of their own, check that the adapter installs what its bill names, and prove the brokering path with a fake key.
 - The pull request carries the third-party comparison itself, with each component's licence, rather than leaving it in the run log.
