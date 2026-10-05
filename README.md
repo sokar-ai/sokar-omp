@@ -6,6 +6,8 @@ with your credential kept on the machine and its work waiting for your review. I
 [Pi](https://github.com/earendil-works/pi), which [sokar-pi](https://github.com/sokar-ai/sokar-pi)
 adapts.
 
+Its documentation: **<https://sokar-ai.github.io/omp/>**.
+
 ## Install
 
 Once Sokar's package repository is set up, as Sokar's
