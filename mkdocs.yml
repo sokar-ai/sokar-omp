@@ -3,4 +3,5 @@
 site_name: Oh My Pi for Sokar
 docs_dir: doc
 nav:
+  - Oh My Pi: index.md
   - Decisions: decisions.md
