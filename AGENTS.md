@@ -268,6 +268,12 @@ what is one adapter's alone stays outside.
 
 - **Issues here are `OMnn-Short-Title.md`, with the prefix `OM`.** `IssueCitationTest` keys on the
   shape `[A-Z]{1,2}\d{2}` and fails on a number that names no open issue.
+- **Never set `PI_CONFIG_DIR` or `PI_PROFILE` in a task image or the adapter.** Either moves omp's
+  config away from the file Sokar writes, and the task then talks straight to the provider.
+- **Re-check upstream's release workflow whenever it changes**, and once it signs its releases or
+  publishes build provenance or artifact attestations, verify that in the update job and record it
+  in the bill of materials. Why the binary is taken on its digest alone until then is in
+  `doc/decisions.md`.
 
 ## What this repository is
 

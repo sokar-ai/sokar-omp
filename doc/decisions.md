@@ -26,7 +26,7 @@ what it may do in a task, how it is built and updated, and the risks accepted on
 | The task | [A task that comes back continues its conversation](#a-task-that-comes-back-continues-its-conversation) - `--resume` with the id from the session record |
 | Updates | [Its release cadence is unlike the other two](#its-release-cadence-is-unlike-the-other-two) - many releases to Pi's few, so no rule follows from a shared origin |
 | Updates | [What an update takes, and when](#what-an-update-takes-and-when) - three days old and still the newest, a patch bump, a real model call |
-| The build | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the digest parser's matrix it must keep |
+| The build | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, and the matrix its digest parser was measured on |
 | The build | [Actions run from a commit, and Dependabot moves them](#actions-run-from-a-commit-and-dependabot-moves-them) - every `uses:` at a commit, `check-actions` refuses the rest, GraalVM by Sokar's pin |
 | The build | [NullAway is configured in this pom, not in the shared parent](#nullaway-is-configured-in-this-pom-not-in-the-shared-parent) - the parent is not this repository's to change |
 | The build | [The changelog is written by hand, and nothing enforces it](#the-changelog-is-written-by-hand-and-nothing-enforces-it) - requiring an entry belongs to Sokar's changelog check, on logchange |
@@ -73,7 +73,7 @@ each under its own name from its own package.
 **One shared name remains, and it is an environment variable.** omp honours `PI_CONFIG_DIR` and
 `PI_PROFILE` from its ancestry. Either one moves its config directory away from `~/.omp/agent`, so the
 file Sokar writes is never read and the task talks straight to the provider - measured. Sokar sets
-neither, and nothing in a task image sets them; they must not be added.
+neither, and nothing in a task image sets them.
 
 ## A fork is not a promise: how this agent is pointed at the broker
 
@@ -267,7 +267,7 @@ workflow line, and the second copy is the one that goes stale. At package time t
 plugin dependency of the exec plugin, not of the project, so it never reaches the bill of materials
 or the native image's classpath.
 
-**The digest parser must keep this matrix**, each row served as a `SHA256SUMS.txt` to the tool's
+**The digest parser was measured on this matrix**, each row served as a `SHA256SUMS.txt` to the tool's
 `check-pin`:
 
 | input | expected |
@@ -395,9 +395,7 @@ attestation that we could verify against, and both objects come from one authori
 cannot perform cannot be written.
 
 **What would change it:** upstream signing its releases, publishing build provenance, or GitHub
-artifact attestations for the release assets. Any of those should be verified in the update job and
-recorded in the bill of materials. This is worth re-checking whenever upstream changes its release
-workflow, which it does often.
+artifact attestations for the release assets. Upstream changes its release workflow often.
 
 **What reduces it meanwhile:** the version is pinned rather than floating; the digest is checked
 before installation in the image layer; the update job opens a pull request rather than publishing
