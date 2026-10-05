@@ -1,0 +1,127 @@
+# Oh My Pi - https://github.com/can1357/oh-my-pi
+#
+# NOT the Pi that sokar-pi adapts. That one is earendil-works/pi, published as
+# @earendil-works/pi-coding-agent and run as 'pi'. This one is a fork of a different Pi, published
+# as @oh-my-pi/pi-coding-agent and run as 'omp'. Three projects, two names.
+
+name: omp
+label: Oh My Pi
+binary: omp
+
+# What turns this agent's own approval prompts off. Sokar adds these to every run inside a task,
+# attached or not - never conditionally: the container is what makes the answer always yes, and
+# unattended there is nobody to answer. Only the 'how' is declared here, because the flag is this
+# CLI's own and Sokar must not guess it.
+#
+# --auto-approve rather than --approval-mode=yolo: both exist in 'omp --help', and the first says
+# only what is meant here - skip the approval prompts - while the second overrides a configured
+# mode with a third value whose other effects are undocumented.
+sandboxed:
+  arguments: ["--auto-approve"]
+
+# How the agent is told how its task's mailbox works. Sokar writes the instructions to a
+# read-only file in a task that has a mailbox and puts these arguments behind the 'sandboxed' ones, '{file}'
+# standing for its path, on every start, attended or not, a resumed one included. A task without a
+# mailbox gets neither. 'omp --help' on 18.4.1: "--append-system-prompt=<value>  Append text or file contents to the system prompt", so a
+# path given there brings in the file's contents.
+instructions:
+  arguments: ["--append-system-prompt", "{file}"]
+
+git_identity:
+  name: Oh My Pi
+  email: noreply@omp.sh
+
+headless:
+  # 'omp --print --mode json "<prompt>"'. The prompt is positional, so no flag names it - an empty
+  # prompt flag is how a definition says that. There is no turn limit and no verbose flag.
+  prompt_flag: ""
+  model_flag: "--model"
+  output_format_flags: ["--print", "--mode", "json"]
+
+session:
+  supports_resume: true
+  # '--resume', not '--session': 18.4.1 has no '--session' ('omp --help': "-r, --resume=<value>  Resume
+  # a session (by ID prefix, path, or picker if omitted)"), so a task started again with it failed on an
+  # unknown option instead of continuing. Measured: '--resume <id>' continues the session.
+  resume_flag: "--resume"
+  # Where it names the session it runs. Measured on 18.4.1: an unattended run's first record,
+  # {"type":"session"}, carries the id. An attended session is kept as
+  # ~/.omp/agent/sessions/--workspace--/<timestamp>_<id>.jsonl, with the same {"type":"session"} record
+  # inside it after a title record; Sokar reads the id from there, and '--resume <id>' continues it.
+  session_id:
+    record: { type: session }
+    key: id
+    directory: ".omp/agent/sessions/--workspace--"
+    suffix: ".jsonl"
+  # What the agent shows once it is at work, attended, having asked nothing - the acceptance kit
+  # waits for it without typing. Measured at a terminal: on screen at the prompt, absent while
+  # the setup wizard is up. The bound covers a first image build.
+  ready_marker: "Welcome back!"
+  ready_within_seconds: 300
+  # When the agent is at rest at its prompt, for Sokar to type its one wake line into the session
+  # and only then; never where 'waiting' matches. Read from the last 20 lines of the screen, plain. Measured
+  # on the VM at a terminal: at rest its status line starts "π > ", and while it works a spinner and the
+  # turn's time stand there instead ("⠋ 59s > ◉ …"); "📁 /workspace" is in it either way, so the shell left when omp
+  # exits never matches. Not a bare "⎋": a start tip can stay on the screen ending "— ⎋ cancels" (measured, it kept
+  # a wake from ever being typed). Its question box ends "↑/↓ move · ⎋ cancel".
+  at_rest:
+    shows: ["π > ", "📁 /workspace"]
+    lacks: ["↑/↓ move · ⎋ cancel"]
+  # What waiting for a person looks like on the attached screen, for Sokar to read. Measured on
+  # 18.4.1 at a terminal: its ask box ends with "⏎ select · n note · ↑/↓ move ·
+  # ⎋ cancel" - symbols where earlier releases wrote "Enter" and "Esc". A bare "⎋" is not enough:
+  # its working line starts with one too. The window title's "π !" says the same, but Sokar reads
+  # the screen. Like the title, this is armed for its ask tool and approval prompts, not for the
+  # model picker or /login: it under-reports, which is the safe direction. Unattended its ask tool
+  # refuses to run without a terminal, so a run that wanted to ask ends with an error.
+  waiting:
+    screen:
+      - contains: "↑/↓ move · ⎋ cancel"
+        in_last_lines: 5
+        for: "an answer to its question"
+
+provider:
+  # OpenRouter's half - upstream, bearer header, the /api/v1 the OpenAI dialect is served under -
+  # is declared once in providers/openrouter.yaml.
+  default: openrouter
+
+  # 'native' because omp is not tied to one wire format: it knows providers and speaks whichever
+  # each one's own dialect is. Measured against 18.1.13: under the openrouter provider it posts to
+  # <baseUrl>/responses for anthropic, openai and z-ai model ids alike.
+  dialect: native
+
+  # A URL, not a socket: omp is pointed at a provider by a base URL in models.yml and has nowhere
+  # to put a socket path. Sokar answers that by binding a relay inside this task's namespace.
+  endpoint: url
+
+# Names 18.1.13 resolves and does not need: its own model catalogue, live model lists for
+# providers this task has no credential for, and the registry it was published to. Measured with
+# a resolver answering NXDOMAIN to every one of them - the run still reached its endpoint and
+# completed. Listed rather than left out so a reviewer can tell a refusal from an oversight, and
+# so the domain-coverage check can tell them apart too.
+#
+# There is deliberately no allowed_domains. The provider declares its own host, and nothing else
+# has to resolve for omp to start - unlike Claude Code, which quits without three of them.
+refused_domains:
+  - catalog.stencil.so
+  - api.kilo.ai
+  - api.venice.ai
+  - zenmux.ai
+  - coding-intl.dashscope.aliyuncs.com
+  - registry.npmjs.org
+
+install:
+  # One self-contained binary, so it is fetched and verified rather than carried in the package
+  # the way a tree of files has to be. Upstream publishes SHA256SUMS.txt beside every release,
+  # so the digest is the publisher's rather than one computed here:
+  #   https://github.com/can1357/oh-my-pi/releases/download/v<version>/SHA256SUMS.txt
+  #
+  # 200 MB, because it embeds the Bun runtime the CLI needs - 'omp' is a Bun single-file
+  # executable, not a Node script.
+  version: "${agent.cli.version}"
+  artifacts:
+    - url: https://github.com/can1357/oh-my-pi/releases/download/v${agent.cli.version}/omp-linux-x64
+      sha256: "494ed1f2c8eb223168d87d3592cf56aa52afe4d35f4191908ba99a0fbe57fad9"
+      license: "MIT"
+      target: /home/agent/.local/bin/omp
+      mode: "0755"
