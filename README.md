@@ -1,5 +1,10 @@
 # sokar-omp
 
+<img src="doc/images/early-bird.svg" width="640" alt="Early bird - work in progress">
+
+> **Early bird - work in progress.** Sokar is not stable yet: until release 1.0.0, its code, commands
+> and file formats can change without notice.
+
 Runs [Oh My Pi](https://github.com/can1357/oh-my-pi) (`omp`) inside
 [Sokar](https://github.com/sokar-ai/sokar): in a hardened container, reaching only what it needs,
 with your credential kept on the machine and its work waiting for your review. It is not
