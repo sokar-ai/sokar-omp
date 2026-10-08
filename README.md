@@ -10,6 +10,8 @@ Runs [Oh My Pi](https://github.com/can1357/oh-my-pi) (`omp`) inside
 with your credential kept on the machine and its work waiting for your review. It is not
 [Pi](https://github.com/earendil-works/pi), which [sokar-pi](https://github.com/sokar-ai/sokar-pi)
 adapts.
+It is an adapter, not Sokar: it describes the agent and shapes in Java only what the agent cannot
+express as data, and it depends on Sokar's published agent API alone, never on Sokar's implementation.
 
 Its documentation: **<https://sokar-ai.github.io/omp/>**.
 

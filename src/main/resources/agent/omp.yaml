@@ -19,10 +19,10 @@ binary: omp
 sandboxed:
   arguments: ["--auto-approve"]
 
-# How the agent is told how its task's mailbox works. Sokar writes the instructions to a
-# read-only file in a task that has a mailbox and puts these arguments behind the 'sandboxed' ones, '{file}'
-# standing for its path, on every start, attended or not, a resumed one included. A task without a
-# mailbox gets neither. 'omp --help' on 18.4.1: "--append-system-prompt=<value>  Append text or file contents to the system prompt", so a
+# How the agent is told what Sokar puts in its task - the mailbox where there is one, /sokar/files and
+# what arrives there. Sokar writes this guide to a read-only file in every task Sokar makes and puts these
+# arguments behind the 'sandboxed' ones, '{file}' standing for its path, on every start, attended or not, a resumed
+# one included. 'omp --help' on 18.4.1: "--append-system-prompt=<value>  Append text or file contents to the system prompt", so a
 # path given there brings in the file's contents.
 instructions:
   arguments: ["--append-system-prompt", "{file}"]
