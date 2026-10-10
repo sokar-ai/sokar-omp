@@ -55,7 +55,7 @@
         <sokar.release.upstream>github-latest https://api.github.com/repos/can1357/oh-my-pi/releases/latest</sokar.release.upstream>
         <sokar.release.digest>sums https://github.com/can1357/oh-my-pi/releases/download/v{version}/SHA256SUMS.txt omp-linux-x64</sokar.release.digest>
         <sokar.release.license>github-license https://api.github.com/repos/can1357/oh-my-pi/license?ref=v{version}</sokar.release.license>
-        <!-- The operator's rule: a release is taken once it is three days old. -->
+        <!-- The rule: a release is taken once it is three days old. -->
         <sokar.release.min-age>3d</sokar.release.min-age>
 
         <!-- The published contract this builds against. Nothing else of Sokar's is on the
@@ -239,7 +239,7 @@
                                 <configuration>
                                     <imageName>sokar-agent-omp</imageName>
                                     <mainClass>org.fuin.sokar.agent.impl.omp.OmpAgent</mainClass>
-                                    <!-- The x86-64 baseline, by the operator's decision: native-image's default is v3,
+                                    <!-- The x86-64 baseline: native-image's default is v3,
                                          and a CPU or VM without AVX2 would install the package and not start it.
                                          NativeLinkageCheck holds the binary to exactly the baseline. -->
                                     <buildArgs>
