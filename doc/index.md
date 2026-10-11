@@ -58,6 +58,9 @@ work goes; `sokar project default list` shows the name `-r` takes. Started insid
   `--provider github-copilot`). Oh My Pi needs no host of its own to start. Nothing else resolves.
 - **Refused on purpose:** its model catalogue, model lists of providers the task has no credential
   for, and `registry.npmjs.org`. It works without them.
+- **Python eval needs `python3` in the task's image.** The image Sokar builds has it, where the base
+  has a package manager; `omp setup python --check` in the task says "Python execution is ready". A
+  project whose own image lacks it gets Oh My Pi's notice at start, and eval runs JavaScript only.
 
 `sokar agents --verbose` shows all of it for the installed version.
 
